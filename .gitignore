@@ -1,3 +1,17 @@
+# Directories
+.vs/
+bin/
+bin-int/
+.idea/
+
+# solution files
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+# Files
+*.user
 # Prerequisites
 *.d
 

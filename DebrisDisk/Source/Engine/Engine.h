@@ -3,6 +3,8 @@
 #include "Window.h"
 #include "Log.h"
 
+#include "Renderer/Scene.h"
+
 namespace DebrisDisk
 {
 	class FEngine
@@ -20,7 +22,9 @@ namespace DebrisDisk
 
 	private:
 		bool bRunning = true;
+
 		FWindow* Window = nullptr;
 		FLog* Log = nullptr;
+		RScene* Scene = nullptr;
 	};
 }

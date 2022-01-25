@@ -13,8 +13,9 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "DebrisDisk/ThirdParty/GLFW/include"
 IncludeDir["glad"] = "DebrisDisk/ThirdParty/glad/include"
+IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
 
-include "DebrisDisk/ThirdParty/GLFW/premake.lua"
+include "DebrisDisk/ThirdParty/GLFW"
 include "DebrisDisk/ThirdParty/glad"
 
 project "DebrisDisk"
@@ -37,6 +38,7 @@ project "DebrisDisk"
 		"DebrisDisk/ThirdParty",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
+		"%{IncludeDir.spdlog}",
 	}
 
 	links
@@ -52,7 +54,7 @@ project "DebrisDisk"
 	}
 
 	filter "system:windows"
-		systemversion "10.0"
+		systemversion "latest"
 
 		defines
 		{

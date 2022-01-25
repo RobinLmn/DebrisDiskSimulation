@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	DebrisDisk::Engine& Engine = DebrisDisk::Engine::GetEngine();
+	DebrisDisk::FEngine& Engine = DebrisDisk::FEngine::GetEngine();
 	Engine.Run();
 
 	return 0;

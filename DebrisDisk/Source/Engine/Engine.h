@@ -1,20 +1,26 @@
 #pragma once
 
+#include "Window.h"
+#include "Log.h"
+
 namespace DebrisDisk
 {
-	class Engine
+	class FEngine
 	{
 	public:
-		static Engine& GetEngine() { static Engine Engine; return Engine; }
+		static FEngine& GetEngine() { static FEngine Engine; return Engine; }
 		void Run();
 
-		Engine(Engine& e) = delete;
-		void operator=(const Engine& e) = delete;
+		FEngine(FEngine& e) = delete;
+		void operator=(const FEngine& e) = delete;
+		~FEngine();
 
 	private:
-		Engine() = default;
+		FEngine();
 
 	private:
 		bool bRunning = true;
+		FWindow* Window = nullptr;
+		FLog* Log = nullptr;
 	};
 }

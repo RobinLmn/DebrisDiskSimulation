@@ -1,12 +1,24 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 
 namespace DebrisDisk
 {
-	class Window
+	class FWindow
 	{
+	public:
+		FWindow(int width, int height, int vsync);
 
+		void Init();
+		void Update();
+		void Terminate();
+
+	public:
+		int Width;
+		int Height;
+		bool bVSync;
+
+	private:
+		GLFWwindow* NativeWindow;
 	};
 }

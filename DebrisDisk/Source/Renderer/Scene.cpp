@@ -8,7 +8,7 @@ namespace DebrisDisk
         float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
          0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
+         0.0f,  0.5f, 0.0f  // top
         };
 
         glGenVertexArrays(1, &VAO);
@@ -24,15 +24,22 @@ namespace DebrisDisk
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(0);
+
+        Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
 	}
 
 	void RScene::Render()
 	{
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glUseProgram(Shader->ID);
+        // set shader's camera variable
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        glPointSize(3);
+        glDrawArraysInstanced(GL_POINTS, 0, 1, 3);
 	}
 
 	void RScene::Terminate()

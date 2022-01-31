@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Shader.h"
+
 namespace DebrisDisk
 {
 	class RScene
@@ -11,5 +13,6 @@ namespace DebrisDisk
 
 	private:
 		unsigned int VBO, VAO;
+		RShader* Shader;
 	};
 }

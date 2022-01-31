@@ -14,6 +14,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "DebrisDisk/ThirdParty/GLFW/include"
 IncludeDir["glad"] = "DebrisDisk/ThirdParty/glad/include"
 IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
+IncludeDir["glm"] = "TradescantiaEngine/ThirdParty/glm"
 
 include "DebrisDisk/ThirdParty/GLFW"
 include "DebrisDisk/ThirdParty/glad"
@@ -28,8 +29,8 @@ project "DebrisDisk"
 
 	files
 	{
-		"DebrisDisk/Source/**.h",
-		"DebrisDisk/Source/**.cpp",
+		"%{prj.name}/Source/**.h",
+		"%{prj.name}/Source/**.cpp",
 	}
 
 	includedirs
@@ -39,6 +40,7 @@ project "DebrisDisk"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
 		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.glm}",
 	}
 
 	links

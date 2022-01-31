@@ -1,29 +1,41 @@
 #include "Scene.h"
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Systems/DebrisDisk.h"
 
 namespace DebrisDisk
 {
+
+    RScene::RScene(RCamera* Camera)
+        : Camera(Camera), Disk(new SDebrisDisk())
+    {
+    }
+
 	void RScene::Init()
 	{
-        float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top
-        };
+        Disk->Init();
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
+
         glBindVertexArray(VAO);
-
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
+        glBufferData(GL_ARRAY_BUFFER, 0, {}, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+        glEnableVertexAttribArray(0);
         glBindVertexArray(0);
+
+        glCreateBuffers(1, &ParticleBuffer);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ParticleBuffer);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, Disk->Particles.size() * sizeof(Particle), Disk->Particles.data(), GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
 	}
@@ -34,17 +46,23 @@ namespace DebrisDisk
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(Shader->ID);
-        // set shader's camera variable
+        glUniformMatrix4fv(glGetUniformLocation(Shader->ID, "ViewProjectionMat"), 1, GL_FALSE, glm::value_ptr(Camera->ViewProjectionMat));
+
 		glBindVertexArray(VAO);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ParticleBuffer);
 
         glEnable(GL_PROGRAM_POINT_SIZE);
-        glPointSize(3);
-        glDrawArraysInstanced(GL_POINTS, 0, 1, 3);
+        glPointSize(1);
+        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Count);
+
+        glBindVertexArray(0);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
 	}
 
 	void RScene::Terminate()
 	{
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &ParticleBuffer);
 	}
 }

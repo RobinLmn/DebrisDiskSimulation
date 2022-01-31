@@ -2,8 +2,8 @@
 
 #include "Window.h"
 #include "Log.h"
-
 #include "Renderer/Scene.h"
+#include "Systems/CameraController.h"
 
 namespace DebrisDisk
 {
@@ -17,6 +17,8 @@ namespace DebrisDisk
 		void operator=(const FEngine& e) = delete;
 		~FEngine();
 
+		inline const FWindow& GetWindow() const { return *Window; }
+
 	private:
 		FEngine();
 
@@ -26,5 +28,6 @@ namespace DebrisDisk
 		FWindow* Window = nullptr;
 		FLog* Log = nullptr;
 		RScene* Scene = nullptr;
+		SCameraController* CameraController = nullptr;
 	};
 }

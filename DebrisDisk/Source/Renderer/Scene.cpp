@@ -1,10 +1,11 @@
 #include "Scene.h"
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GLFW/glfw3.h>
 
 #include "Systems/DebrisDisk.h"
+#include <Tracy/Tracy.hpp>
 
 namespace DebrisDisk
 {
@@ -16,6 +17,8 @@ namespace DebrisDisk
 
 	void RScene::Init()
 	{
+        ZoneScoped
+
         Disk->Init();
 
         glGenVertexArrays(1, &VAO);
@@ -42,6 +45,8 @@ namespace DebrisDisk
 
 	void RScene::Render()
 	{
+        ZoneScoped
+
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 

@@ -15,9 +15,11 @@ IncludeDir["GLFW"] = "DebrisDisk/ThirdParty/GLFW/include"
 IncludeDir["glad"] = "DebrisDisk/ThirdParty/glad/include"
 IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
 IncludeDir["glm"] = "TradescantiaEngine/ThirdParty/glm"
+IncludeDir["Tracy"] = "TradescantiaEngine/ThirdParty/Tracy"
 
 include "DebrisDisk/ThirdParty/GLFW"
 include "DebrisDisk/ThirdParty/glad"
+include "DebrisDisk/ThirdParty/Tracy"
 
 project "DebrisDisk"
 	location "DebrisDisk"
@@ -41,12 +43,14 @@ project "DebrisDisk"
 		"%{IncludeDir.glad}",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.Tracy}",
 	}
 
 	links
 	{
 		"GLFW",
 		"glad",
+		"Tracy"
 	}
 
 	defines
@@ -74,7 +78,7 @@ project "DebrisDisk"
 		optimize "on"
 
 	filter "configurations:Profile"
-		defines {"PROFILE"}
+		defines {"RELEASE", "PROFILE", "TRACY_ENABLE"}
 		runtime "Release"
 		optimize "on"
 		symbols "on"

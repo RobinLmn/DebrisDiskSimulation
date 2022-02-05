@@ -1,13 +1,21 @@
 #include "Engine.h"
+#include "Tracy/Tracy.hpp"
 
 namespace DebrisDisk
 {
 	FEngine::FEngine()
 	{
-		float Width = 1080.f;
-		float Height = 720.f;
+		ZoneScoped
 
-		RCamera* Camera = new RCamera(90.f, Width / Height, 10.f, -1.f);
+		int Width = 1080;
+		int Height = 720;
+		glm::vec3 InitialCamPos = glm::vec3(0.f, 0.f, 0.f);
+		float Fov = 90.f;
+		float NearPlane = 0.f;
+		float FarPlane = 100.f;
+
+		float AspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
+		RCamera* Camera = new RCamera(InitialCamPos, Fov, AspectRatio, NearPlane, FarPlane);
 
 		Window = new FWindow(Width, Height, false);
 		Log = new FLog();
@@ -17,6 +25,8 @@ namespace DebrisDisk
 
 	void FEngine::Run()
 	{
+		ZoneScoped
+
 		Log->Init();
 		Window->Init();
 		Scene->Init();
@@ -29,6 +39,8 @@ namespace DebrisDisk
 
 		while (bRunning)
 		{
+			FrameMark
+
 			const float deltaTime = std::chrono::duration_cast<seconds>(Clock.now() - LastTime).count();
 			LastTime = Clock.now();
 

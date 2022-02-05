@@ -3,8 +3,8 @@
 
 namespace DebrisDisk
 {
-	RCamera::RCamera(float Fov, float AspectRatio, float NearPlane, float FarPlane)
-		: ProjectionMat(glm::perspective(glm::radians(Fov), AspectRatio, NearPlane, FarPlane))
+	RCamera::RCamera(glm::vec3 Pos, float Fov, float AspectRatio, float NearPlane, float FarPlane)
+		: Position(Pos), ProjectionMat(glm::perspective(glm::radians(Fov), AspectRatio, NearPlane, FarPlane))
 	{
 		ViewMat = glm::lookAt(Position, Position + Front, Up);
 		ViewProjectionMat = ProjectionMat * ViewMat;

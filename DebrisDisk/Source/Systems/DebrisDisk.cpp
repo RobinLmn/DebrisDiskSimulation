@@ -29,7 +29,7 @@ namespace DebrisDisk
 			Particles.insert(Particles.end(), OrbitParticles.begin(), OrbitParticles.end());
 		}
 
-		Count = Orbits.size() * ParticlesPerOrbit;
+		Count = static_cast<uint32_t>(Orbits.size()) * ParticlesPerOrbit;
 	}
 
 	std::vector<Particle>* SDebrisDisk::OrbitToParticle(Orbit O)
@@ -39,7 +39,7 @@ namespace DebrisDisk
 		std::vector<Particle>* ParticlesInOrbit = new std::vector<Particle>();
 		ParticlesInOrbit->reserve(ParticlesPerOrbit);
 
-		for (int i = 0; i < ParticlesPerOrbit; i++)
+		for (uint32_t i = 0; i < ParticlesPerOrbit; i++)
 		{
 			float Theta = glm::sqrt( (1.f + O.Eccentricity) / (1.f - O.Eccentricity) * glm::tan( glm::linearRand( -PI, PI ) ) );
 			Theta = 2.f * glm::atan(Theta);

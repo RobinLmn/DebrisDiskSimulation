@@ -14,17 +14,15 @@
 
 namespace DebrisDisk
 {
+	SDebrisDisk::SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation)
+		: ParticlesPerOrbit(ParticlesPerOrbit), OrbitFile(OrbitFile), FixedRadiation(FixedRadiation)
+	{}
+
 	void SDebrisDisk::Init()
 	{
 		ZoneScoped
 
-		ParticlesPerOrbit = 100;
-		Particles.reserve(Count);
-
-		//OrbitsFromFile("Content/dustorbit/single_inner_planet_beta0.2_dustorbit.txt"); // ring
-		OrbitsFromFile("Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"); // moth
-		//OrbitsFromFile("Content/dustorbit/single_inner_planet_single_collision_beta0.35_dustorbit.txt"); // wings
-		//OrbitsFromFile("Content/dustorbit/single_inner_planet_e0.7_Ifree0_efree0_betadistrb1.5_bmin0.001_bmax1.0_Isig0.15_peri_orbcorr_dustorbit.txt"); // needle
+		OrbitsFromFile(OrbitFile);
 
 		for (int i = 0; i < Orbits.size(); i++)
 		{
@@ -67,13 +65,19 @@ namespace DebrisDisk
 			float x = r * ( glm::cos(O.Omega) * glm::cos(O.omega + f) - glm::sin(O.Omega) * glm::sin(O.omega + f) * glm::cos(O.I) );
 			float y = r * ( glm::sin(O.Omega) * glm::cos(O.omega + f) + glm::cos(O.Omega) * glm::sin(O.omega + f) * glm::cos(O.I) );
 			float z = r * ( glm::sin(O.omega + f) * glm::sin(O.I) );
-
+		
 			Particle DustParticle;
-			DustParticle.Pos = glm::vec4(x, y, z, 1.f);
+			DustParticle.Rad2 = x*x + y*y + z*z;
+			DustParticle.Beta = O.Beta;
+			DustParticle.Pos = glm::vec4(x, z, y, 1.f);
 			ParticlesInOrbit->push_back(DustParticle);
 		}
 
 		return ParticlesInOrbit;
+	}
+
+	void SDebrisDisk::Update(float DeltaTime)
+	{
 	}
 
 	void SDebrisDisk::OrbitsFromFile(std::string Filename)

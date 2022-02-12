@@ -5,10 +5,10 @@
 
 namespace DebrisDisk
 {
-	class SCameraController
+	class RCameraController
 	{
 	public:
-		SCameraController(RCamera* Camera);
+		RCameraController(RCamera* Camera);
 		void Update(float DeltaTime);
 
 	public:

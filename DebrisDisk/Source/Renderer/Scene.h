@@ -9,7 +9,7 @@ namespace DebrisDisk
 	class RScene
 	{
 	public:
-		RScene(RCamera* Camera);
+		RScene(RCamera* Camera, SDebrisDisk* Disk);
 
 		void Init();
 		void Render();

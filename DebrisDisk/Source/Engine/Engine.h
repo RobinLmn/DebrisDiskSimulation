@@ -3,7 +3,8 @@
 #include "Window.h"
 #include "Log.h"
 #include "Renderer/Scene.h"
-#include "Systems/CameraController.h"
+#include "Renderer/CameraController.h"
+#include "Systems/DebrisDisk.h"
 
 namespace DebrisDisk
 {
@@ -28,6 +29,7 @@ namespace DebrisDisk
 		FWindow* Window = nullptr;
 		FLog* Log = nullptr;
 		RScene* Scene = nullptr;
-		SCameraController* CameraController = nullptr;
+		RCameraController* CameraController = nullptr;
+		SDebrisDisk* DebrisDisk = nullptr;
 	};
 }

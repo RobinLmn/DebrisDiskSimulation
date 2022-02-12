@@ -10,16 +10,14 @@
 namespace DebrisDisk
 {
 
-    RScene::RScene(RCamera* Camera)
-        : Camera(Camera), Disk(new SDebrisDisk())
+    RScene::RScene(RCamera* Camera, SDebrisDisk* Disk)
+        : Camera(Camera), Disk(Disk)
     {
     }
 
 	void RScene::Init()
 	{
         ZoneScoped
-
-        Disk->Init();
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
@@ -37,7 +35,6 @@ namespace DebrisDisk
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ParticleBuffer);
         glBufferData(GL_SHADER_STORAGE_BUFFER, Disk->Particles.size() * sizeof(Particle), Disk->Particles.data(), GL_DYNAMIC_DRAW);
-
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
@@ -52,6 +49,7 @@ namespace DebrisDisk
 
         glUseProgram(Shader->ID);
         glUniformMatrix4fv(glGetUniformLocation(Shader->ID, "ViewProjectionMat"), 1, GL_FALSE, glm::value_ptr(Camera->ViewProjectionMat));
+        glUniform3f(glGetUniformLocation(Shader->ID, "CameraPos"), Camera->Position.x, Camera->Position.y, Camera->Position.z);
 
 		glBindVertexArray(VAO);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ParticleBuffer);

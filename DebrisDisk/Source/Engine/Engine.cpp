@@ -13,14 +13,20 @@ namespace DebrisDisk
 		float Fov = 90.f;
 		float NearPlane = 0.f;
 		float FarPlane = 100.f;
+		uint32_t ParticlesPerOrbit = 100;
+		float FixedRadiation = 0.35f;
+		std::string OrbitFile = "Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"; // moth
+		//std::string OrbitFile = "Content/dustorbit/single_inner_planet_beta0.2_dustorbit.txt"; // ring
+		//std::string OrbitFile = "Content/dustorbit/single_inner_planet_single_collision_beta0.35_dustorbit.txt"; // wings
 
 		float AspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
 		RCamera* Camera = new RCamera(InitialCamPos, Fov, AspectRatio, NearPlane, FarPlane);
 
 		Window = new FWindow(Width, Height, false);
 		Log = new FLog();
-		Scene = new RScene(Camera);
-		CameraController = new SCameraController(Camera);
+		DebrisDisk = new SDebrisDisk(ParticlesPerOrbit, OrbitFile, FixedRadiation);
+		Scene = new RScene(Camera, DebrisDisk);
+		CameraController = new RCameraController(Camera);
 	}
 
 	void FEngine::Run()
@@ -29,6 +35,7 @@ namespace DebrisDisk
 
 		Log->Init();
 		Window->Init();
+		DebrisDisk->Init();
 		Scene->Init();
 
 		LOG_INFO("Engine Initialized");
@@ -41,10 +48,11 @@ namespace DebrisDisk
 		{
 			FrameMark
 
-			const float deltaTime = std::chrono::duration_cast<seconds>(Clock.now() - LastTime).count();
+			const float DeltaTime = std::chrono::duration_cast<seconds>(Clock.now() - LastTime).count();
 			LastTime = Clock.now();
 
-			CameraController->Update(deltaTime);
+			CameraController->Update(DeltaTime);
+			DebrisDisk->Update(DeltaTime);
 			Scene->Render();
 			Window->Update();
 		}

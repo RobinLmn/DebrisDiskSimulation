@@ -4,12 +4,12 @@
 
 namespace DebrisDisk
 {
-	SCameraController::SCameraController(RCamera* Camera)
+	RCameraController::RCameraController(RCamera* Camera)
 		: Camera(Camera), MousePosition(Camera->Position)
 	{
 	}
 
-	void SCameraController::Update(float DeltaTime)
+	void RCameraController::Update(float DeltaTime)
 	{
 		if (FInput::IsKeyPressed(GLFW_KEY_A) || FInput::IsKeyPressed(GLFW_KEY_LEFT))
 			Camera->Position -= glm::normalize(glm::cross(Camera->Front, Camera->Up)) * Camera->Speed * DeltaTime;

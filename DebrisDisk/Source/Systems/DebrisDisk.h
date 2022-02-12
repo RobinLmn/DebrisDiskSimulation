@@ -8,12 +8,12 @@ namespace DebrisDisk
 {
 	struct Orbit
 	{
-		float SemiMajorAxis;	// a
-		float Eccentricity;		// e
-		float Inclinaison;		// I
-		float AscendNodeLong;	// Omega
-		float PeriapseArg;		// omega
-		float Radiation;		// Beta
+		float a;			// SemiMajorAxis;	
+		float e;			// Eccentricity;		 
+		float I;			// Inclinaison;		
+		float Omega;		// AscendNodeLong;	
+		float omega;		// PeriapseArg;	
+		float Beta;			// Radiation;	
 	};
 
 	class SDebrisDisk

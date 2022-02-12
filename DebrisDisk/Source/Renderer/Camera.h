@@ -8,10 +8,9 @@ namespace DebrisDisk
 	public:
 		RCamera(glm::vec3 Pos, float Fov, float AspectRatio, float NearPlane, float FarPlane);
 
-		void IncPitch(float DeltaPitch) { Pitch += DeltaPitch; Recalculate(); }
-		void IncYaw(float DeltaYaw) { Yaw += DeltaYaw; Recalculate(); }
+		void IncPitch(float DeltaPitch);
+		void IncYaw(float DeltaYaw);
 	
-	private:
 		void Recalculate();
 
 	public:
@@ -25,7 +24,8 @@ namespace DebrisDisk
 
 		float Speed = 500.0f;		// meters per sec
 		float Sensitivity = 0.1f;	
-		float Pitch = 0.f;		// degrees
+
+		float Pitch = 0.f;			// degrees
 		float Yaw = 90.f;			// degrees
 	};
 }

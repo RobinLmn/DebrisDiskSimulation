@@ -22,7 +22,7 @@ namespace DebrisDisk
 		Particles.reserve(Count);
 
 		//OrbitsFromFile("Content/dustorbit/single_inner_planet_beta0.2_dustorbit.txt"); // ring
-		//OrbitsFromFile("Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"); // moth
+		OrbitsFromFile("Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"); // moth
 		//OrbitsFromFile("Content/dustorbit/single_inner_planet_single_collision_beta0.35_dustorbit.txt"); // wings
 		//OrbitsFromFile("Content/dustorbit/single_inner_planet_e0.7_Ifree0_efree0_betadistrb1.5_bmin0.001_bmax1.0_Isig0.15_peri_orbcorr_dustorbit.txt"); // needle
 

@@ -10,6 +10,20 @@ namespace DebrisDisk
 		ViewProjectionMat = ProjectionMat * ViewMat;
 	}
 
+	void RCamera::IncPitch(float DeltaPitch)
+	{
+		Pitch += DeltaPitch;
+		if (Pitch > 89.f) Pitch = 89.f;
+		if (Pitch < -89.f) Pitch = -89.f;
+		Recalculate();
+	}
+
+	void RCamera::IncYaw(float DeltaYaw) 
+	{ 
+		Yaw += DeltaYaw; 
+		Recalculate(); 
+	}
+
 	void RCamera::Recalculate()
 	{
 		float YawRad = glm::radians(Yaw);

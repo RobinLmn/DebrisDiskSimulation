@@ -5,7 +5,7 @@
 namespace DebrisDisk
 {
 	SCameraController::SCameraController(RCamera* Camera)
-		: Camera(Camera), MousePosition(glm::vec3(0.f))
+		: Camera(Camera), MousePosition(Camera->Position)
 	{
 	}
 
@@ -31,5 +31,6 @@ namespace DebrisDisk
 		}
 
 		MousePosition = FInput::GetMousePos();
+		Camera->Recalculate();
 	}
 }

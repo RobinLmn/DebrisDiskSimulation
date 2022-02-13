@@ -10,7 +10,7 @@ namespace DebrisDisk
 		int Width = 1080;
 		int Height = 720;
 		glm::vec3 InitialCamPos = glm::vec3(0.f, 0.f, 0.f);
-		float Fov = 90.f;
+		float Fov = 120.f;
 		float NearPlane = 0.f;
 		float FarPlane = 100.f;
 		uint32_t ParticlesPerOrbit = 100;

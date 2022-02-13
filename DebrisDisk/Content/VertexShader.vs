@@ -5,7 +5,7 @@
 uniform mat4 ViewProjectionMat;
 uniform vec3 CameraPos;
 
-out vec4 MyColor;
+out float MyIntensity;
 
 struct ParticleData 
 {
@@ -31,7 +31,5 @@ void main()
     gl_Position = ViewProjectionMat * vec4(P.Pos.xyz, 1.0);
 
     float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
-    float Intensity = 1000 * HG(CosT) / (P.Beta * P.Beta * P.Rad2);
-
-    MyColor = vec4(1.0, 0.4, 0.0, Intensity);
+    MyIntensity = 5000.0 * HG(-CosT) / (P.Beta * P.Beta * P.Rad2);
 }

@@ -16,7 +16,7 @@ namespace DebrisDisk
 		void Terminate();
 
 	private:
-		unsigned int VBO = 0, VAO = 0, ParticleBuffer = 0;
+		unsigned int VBO = 0, VAO = 0, ParticleBuffer = 0, Texture = 0;
 
 		SDebrisDisk* Disk;
 		RShader* Shader = nullptr;

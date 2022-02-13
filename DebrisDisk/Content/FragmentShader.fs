@@ -1,9 +1,11 @@
 #version 330 core
 
-in vec4 MyColor;
+in float MyIntensity;
 out vec4 FragColor;
+
+uniform sampler1D Texture;
   
 void main()
 {
-    FragColor = MyColor;
+    FragColor = vec4(texture(Texture, MyIntensity).xyz, 0.3);
 }

@@ -66,7 +66,7 @@ namespace DebrisDisk
 	{
         ZoneScoped
         
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         glUseProgram(Shader->ID);

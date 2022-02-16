@@ -13,7 +13,7 @@ namespace DebrisDisk
 		float Fov = 120.f;
 		float NearPlane = 0.f;
 		float FarPlane = 100.f;
-		uint32_t ParticlesPerOrbit = 100;
+		uint32_t ParticlesPerOrbit = 1000;
 		float FixedRadiation = 0.35f;
 		std::string OrbitFile = "Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"; // moth
 		//std::string OrbitFile = "Content/dustorbit/single_inner_planet_beta0.2_dustorbit.txt"; // ring

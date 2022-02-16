@@ -20,6 +20,6 @@ namespace DebrisDisk
 	private:
 		bool bScreenshot = false;
 		RCamera* Camera;
-		char Filename[128] = ".png";
+		char Filename[128] = "Debris Disk";
 	};
 }

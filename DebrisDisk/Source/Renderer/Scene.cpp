@@ -107,7 +107,7 @@ namespace DebrisDisk
         unsigned char* Buffer = (unsigned char*)malloc(Window.Width * Window.Height * 3);
         glReadPixels(0, 0, Window.Width, Window.Height, GL_RGB, GL_UNSIGNED_BYTE, Buffer);
         unsigned char* LastRow = Buffer + (Window.Width * 3 * (Window.Height - 1));
-        if (!stbi_write_png(("Content/Screenshots/" + Filename).c_str(), Window.Width, Window.Height, 3, LastRow, -3 * Window.Width))
+        if (!stbi_write_png(("Content/Screenshots/" + Filename + ".png").c_str(), Window.Width, Window.Height, 3, LastRow, -3 * Window.Width))
             LOG_ERROR("Could not write png.");
         free(Buffer);
     }

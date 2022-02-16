@@ -88,7 +88,6 @@ namespace DebrisDisk
 
 		if (File.is_open())
 		{
-
 			while (std::getline(File, Line))
 			{
 				std::vector<float> Params;

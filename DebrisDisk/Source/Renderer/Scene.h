@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Systems/DebrisDisk.h"
+#include <string>
 
 namespace DebrisDisk
 {
@@ -14,6 +15,8 @@ namespace DebrisDisk
 		void Init();
 		void Render();
 		void Terminate();
+
+		static void Screenshot(std::string Filename);
 
 	private:
 		unsigned int VBO = 0, VAO = 0, ParticleBuffer = 0, Texture = 0;

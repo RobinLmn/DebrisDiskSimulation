@@ -5,11 +5,14 @@
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
+#include "stb_image/stb_image_write.h"
 
 #include "Systems/DebrisDisk.h"
 #include <Tracy/Tracy.hpp>
 #include "Engine/Log.h"
+#include "Engine/Engine.h"
 
 namespace DebrisDisk
 {
@@ -95,4 +98,17 @@ namespace DebrisDisk
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &ParticleBuffer);
 	}
+
+    void RScene::Screenshot(std::string Filename)
+    {
+        // Adapted from https://github.com/quentinplessis/STBI
+
+        const FWindow& Window = FEngine::GetEngine().GetWindow();
+        unsigned char* Buffer = (unsigned char*)malloc(Window.Width * Window.Height * 3);
+        glReadPixels(0, 0, Window.Width, Window.Height, GL_RGB, GL_UNSIGNED_BYTE, Buffer);
+        unsigned char* LastRow = Buffer + (Window.Width * 3 * (Window.Height - 1));
+        if (!stbi_write_png(("Content/Screenshots/" + Filename).c_str(), Window.Width, Window.Height, 3, LastRow, -3 * Window.Width))
+            LOG_ERROR("Could not write png.");
+        free(Buffer);
+    }
 }

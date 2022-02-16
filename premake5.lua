@@ -17,10 +17,12 @@ IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
 IncludeDir["glm"] = "TradescantiaEngine/ThirdParty/glm"
 IncludeDir["tracy"] = "TradescantiaEngine/ThirdParty/tracy"
 IncludeDir["stb_image"] = "TradescantiaEngine/ThirdParty/stb_image"
+IncludeDir["ImGui"] = "TradescantiaEngine/ThirdParty/ImGui"
 
 include "DebrisDisk/ThirdParty/GLFW"
 include "DebrisDisk/ThirdParty/glad"
 include "DebrisDisk/ThirdParty/tracy"
+include "DebrisDisk/ThirdParty/ImGui"
 
 project "DebrisDisk"
 	location "DebrisDisk"
@@ -46,13 +48,15 @@ project "DebrisDisk"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.tracy}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.ImGui}",
 	}
 
 	links
 	{
 		"GLFW",
 		"glad",
-		"Tracy"
+		"Tracy",
+		"ImGui"
 	}
 
 	defines

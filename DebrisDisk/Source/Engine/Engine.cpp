@@ -27,6 +27,7 @@ namespace DebrisDisk
 		DebrisDisk = new SDebrisDisk(ParticlesPerOrbit, OrbitFile, FixedRadiation);
 		Scene = new RScene(Camera, DebrisDisk);
 		CameraController = new RCameraController(Camera);
+		Editor = new FEditor(Camera);
 	}
 
 	void FEngine::Run()
@@ -37,6 +38,7 @@ namespace DebrisDisk
 		Window->Init();
 		DebrisDisk->Init();
 		Scene->Init();
+		Editor->Init();
 
 		LOG_INFO("Engine Initialized");
 
@@ -51,14 +53,20 @@ namespace DebrisDisk
 			const float DeltaTime = std::chrono::duration_cast<seconds>(Clock.now() - LastTime).count();
 			LastTime = Clock.now();
 
+			Editor->NewFrame();
+
 			CameraController->Update(DeltaTime);
 			DebrisDisk->Update(DeltaTime);
+			Editor->Update(DeltaTime);
+
 			Scene->Render();
+			Editor->Render();
 			Window->Update();
 		}
 
 		Scene->Terminate();
 		Window->Terminate();
+		Editor->Terminate();
 	}
 
 	FEngine::~FEngine()

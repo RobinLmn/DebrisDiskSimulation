@@ -4,6 +4,9 @@ bin/
 bin-int/
 .idea/
 
+DebrisDisk/imgui.ini
+DebrisDisk/Content/Screenshots/
+
 # solution files
 **.sln
 **.vcxproj

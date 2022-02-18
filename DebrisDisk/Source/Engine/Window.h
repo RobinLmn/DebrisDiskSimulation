@@ -13,6 +13,8 @@ namespace DebrisDisk
 		void Update();
 		void Terminate();
 
+		inline GLFWwindow* GetNativeWindow() const { return NativeWindow; }
+
 	public:
 		int Width;
 		int Height;

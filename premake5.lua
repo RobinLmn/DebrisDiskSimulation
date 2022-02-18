@@ -14,9 +14,15 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "DebrisDisk/ThirdParty/GLFW/include"
 IncludeDir["glad"] = "DebrisDisk/ThirdParty/glad/include"
 IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
+IncludeDir["glm"] = "TradescantiaEngine/ThirdParty/glm"
+IncludeDir["tracy"] = "TradescantiaEngine/ThirdParty/tracy"
+IncludeDir["stb_image"] = "TradescantiaEngine/ThirdParty/stb_image"
+IncludeDir["ImGui"] = "TradescantiaEngine/ThirdParty/ImGui"
 
 include "DebrisDisk/ThirdParty/GLFW"
 include "DebrisDisk/ThirdParty/glad"
+include "DebrisDisk/ThirdParty/tracy"
+include "DebrisDisk/ThirdParty/ImGui"
 
 project "DebrisDisk"
 	location "DebrisDisk"
@@ -28,8 +34,8 @@ project "DebrisDisk"
 
 	files
 	{
-		"DebrisDisk/Source/**.h",
-		"DebrisDisk/Source/**.cpp",
+		"%{prj.name}/Source/**.h",
+		"%{prj.name}/Source/**.cpp",
 	}
 
 	includedirs
@@ -39,12 +45,18 @@ project "DebrisDisk"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
 		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.tracy}",
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.ImGui}",
 	}
 
 	links
 	{
 		"GLFW",
 		"glad",
+		"Tracy",
+		"ImGui"
 	}
 
 	defines
@@ -72,7 +84,7 @@ project "DebrisDisk"
 		optimize "on"
 
 	filter "configurations:Profile"
-		defines {"PROFILE"}
+		defines {"RELEASE", "PROFILE", "TRACY_ENABLE"}
 		runtime "Release"
 		optimize "on"
 		symbols "on"

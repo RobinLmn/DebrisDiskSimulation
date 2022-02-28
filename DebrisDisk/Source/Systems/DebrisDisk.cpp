@@ -43,13 +43,13 @@ namespace DebrisDisk
 		for (uint32_t i = 0; i < ParticlesPerOrbit; i++)
 		{
 			// Random Mean Anomaly
-			float M = glm::linearRand(-PI, PI);				
+			float M = glm::linearRand(-PI, PI);
 
 			// Newton approximation for Eccentric Anomaly
 			float E = M;	// guess, E ~ M
 			float F = E - O.e * glm::sin(E) - M;
 			int j = 0;
-			while (glm::abs(F) > 0.0001f && j < 100) 
+			while (glm::abs(F) > 0.0001f)
 			{
 				E = E - F / (1.f - O.e * glm::cos(E));
 				F = E - O.e * glm::sin(E) - M;
@@ -69,7 +69,7 @@ namespace DebrisDisk
 			Particle DustParticle;
 			DustParticle.Rad2 = x*x + y*y + z*z;
 			DustParticle.Beta = O.Beta;
-			DustParticle.Pos = glm::vec4(x, z, y, 1.f);
+			DustParticle.Pos = glm::vec4(y, z, -x, 1.f);
 			ParticlesInOrbit->push_back(DustParticle);
 		}
 

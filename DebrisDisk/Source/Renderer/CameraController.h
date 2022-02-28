@@ -13,6 +13,5 @@ namespace DebrisDisk
 
 	public:
 		RCamera* Camera;
-		glm::vec2 MousePosition;
 	};
 }

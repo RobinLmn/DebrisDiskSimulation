@@ -6,26 +6,28 @@ namespace DebrisDisk
 	class RCamera
 	{
 	public:
-		RCamera(glm::vec3 Pos, float Fov, float AspectRatio, float NearPlane, float FarPlane);
+		RCamera(float Fov, float AspectRatio, float NearPlane, float FarPlane);
 
-		void IncPitch(float DeltaPitch);
-		void IncYaw(float DeltaYaw);
+		void IncAlt(float DeltaAlt);
+		void IncAz(float DeltaAz);
 	
 		void Recalculate();
 
 	public:
+		glm::vec3 Position;
+
+		float Az = 0.f;
+		float Alt = 0.0001f;
+		float Distance = 1000.f;
+
+		float Speed = 100.0f;
+		float Sensitivity = 100.0f;
+
 		glm::mat4 ProjectionMat;
 		glm::mat4 ViewMat;
 		glm::mat4 ViewProjectionMat;
 
-		glm::vec3 Position;
+	private:
 		glm::vec3 Up = glm::vec3(0.f, 1.f, 0.f);
-		glm::vec3 Front = glm::vec3(0.f, 0.f, -1.f);
-
-		float Speed = 500.0f;		// meters per sec
-		float Sensitivity = 0.1f;	
-
-		float Pitch = 0.f;			// degrees
-		float Yaw = 90.f;			// degrees
 	};
 }

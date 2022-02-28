@@ -53,16 +53,15 @@ namespace DebrisDisk
 		ImGui::End();
 
 		ImGui::Begin("Camera");
-		ImGui::InputFloat3("Position", (float*)(&Camera->Position));
-		ImGui::InputFloat("Pitch", &Camera->Pitch);
-		ImGui::InputFloat("Yaw", &Camera->Yaw);
 		ImGui::InputFloat("Speed", &Camera->Speed);
-		ImGui::InputFloat("Mouse Sensitivity", &Camera->Sensitivity);
+		ImGui::InputFloat("Az", &Camera->Az);
+		ImGui::InputFloat("Alt", &Camera->Alt);
+		ImGui::InputFloat("Distance", &Camera->Distance);
 		if (ImGui::Button("Reset"))
 		{
-			Camera->Position = glm::vec3(0.f);
-			Camera->Pitch = 0.f;
-			Camera->Yaw = 0.f;
+			Camera->Alt = 0.0001f;
+			Camera->Az = 0.f;
+			Camera->Distance = 1000.f;
 		}
 		ImGui::End();
 	}

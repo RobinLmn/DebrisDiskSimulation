@@ -1,40 +1,56 @@
 #include "Camera.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp >
 
 namespace DebrisDisk
 {
-	RCamera::RCamera(glm::vec3 Pos, float Fov, float AspectRatio, float NearPlane, float FarPlane)
-		: Position(Pos), ProjectionMat(glm::perspective(glm::radians(Fov), AspectRatio, NearPlane, FarPlane))
+	RCamera::RCamera(float Fov, float AspectRatio, float NearPlane, float FarPlane)
+		: ProjectionMat(glm::perspective(glm::radians(Fov), AspectRatio, NearPlane, FarPlane))
 	{
-		ViewMat = glm::lookAt(Position, Position + Front, Up);
-		ViewProjectionMat = ProjectionMat * ViewMat;
-	}
-
-	void RCamera::IncPitch(float DeltaPitch)
-	{
-		Pitch += DeltaPitch;
-		if (Pitch > 89.f) Pitch = 89.f;
-		if (Pitch < -89.f) Pitch = -89.f;
 		Recalculate();
 	}
 
-	void RCamera::IncYaw(float DeltaYaw) 
+	void RCamera::IncAlt(float DeltaAlt)
+	{
+		float newAlt = DeltaAlt + Alt;
+		if (newAlt > 179.999f)
+			Alt = 179.999f;
+		else if (newAlt < 0.0001f)
+			Alt = 0.0001f;
+		else
+			Alt = newAlt;
+
+		Recalculate();
+	}
+
+	void RCamera::IncAz(float DeltAz) 
 	{ 
-		Yaw += DeltaYaw; 
+		float newAz = DeltAz + Az;
+		if (newAz > 180.f)
+			Az = 180.f;
+		else if (newAz < -180.f)
+			Az = -180.f;
+		else
+			Az = newAz;
+
 		Recalculate(); 
 	}
 
 	void RCamera::Recalculate()
 	{
-		float YawRad = glm::radians(Yaw);
-		float PitchRad = glm::radians(Pitch);
 
-		Front.x = cos(YawRad) * cos(PitchRad);
-		Front.y = sin(PitchRad);
-		Front.z = sin(YawRad) * cos(PitchRad);
-		Front = glm::normalize(Front);
+		float AzRad = glm::radians(Az);
+		float AltRad = glm::radians(Alt);
 
-		ViewMat = glm::lookAt(Position, Position + Front, Up);
+		float x = Distance * glm::cos(AzRad) * glm::sin(AltRad);
+		float y = Distance * glm::sin(AzRad) * glm::sin(AltRad);
+		float z = Distance * glm::cos(AltRad);
+
+		Position = glm::vec3(y, z, -x);
+
+		Up = glm::rotateY(Up, Alt);
+
+		ViewMat = glm::lookAt(Position, glm::vec3(0.f), Up);
 		ViewProjectionMat = ProjectionMat * ViewMat;
 	}
 }

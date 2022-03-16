@@ -47,18 +47,22 @@ namespace DebrisDisk
         Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
 
         glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, &Texture);
-        glBindTexture(GL_TEXTURE_1D, Texture);
+        glGenTextures(1, &ScatteringTexture);
+        glBindTexture(GL_TEXTURE_1D, ScatteringTexture);
+        LoadTexture("Scattering");
 
+        glGenTextures(1, &ThermalTexture);
+        glBindTexture(GL_TEXTURE_1D, ThermalTexture);
+        LoadTexture("Thermal");
+	}
+
+    void RScene::LoadTexture(std::string Name)
+    {
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         int Width, Height, NrChannels;
-        unsigned char* TextureData;
-        if (!Camera->bThermal)
-            TextureData = stbi_load("Content/thermal.png", &Width, &Height, &NrChannels, 0);
-        else
-            TextureData = stbi_load("Content/scattering.png", &Width, &Height, &NrChannels, 0);
+        unsigned char* TextureData = stbi_load(("Content/" + Name + ".png").c_str(), &Width, &Height, &NrChannels, 0);
 
         if (TextureData)
         {
@@ -67,8 +71,8 @@ namespace DebrisDisk
         else LOG_ERROR("Failed to log texture");
         stbi_image_free(TextureData);
 
-        glUniform1i(glGetUniformLocation(Shader->ID, "Texture"), 0);
-	}
+        glUniform1i(glGetUniformLocation(Shader->ID, Name.c_str()), 0);
+    }
 
 	void RScene::Render()
 	{
@@ -87,7 +91,11 @@ namespace DebrisDisk
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ParticleBuffer);
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_1D, Texture);
+
+        if (Camera->bThermal)
+            glBindTexture(GL_TEXTURE_1D, ThermalTexture);
+        else
+            glBindTexture(GL_TEXTURE_1D, ScatteringTexture);
         
         glEnable(GL_PROGRAM_POINT_SIZE);
         glPointSize(1);

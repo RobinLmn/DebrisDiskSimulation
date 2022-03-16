@@ -59,10 +59,12 @@ namespace DebrisDisk
 		ImGui::InputFloat("Alt", &Camera->Alt);
 		ImGui::InputFloat("Distance", &Camera->Distance);
 
-		if (ImGui::Button("Thermal / Scattering"))
-		{
-			Camera->bThermal = !Camera->bThermal;
-		}
+		std::string ButtonName = Camera->bThermal ? "Scattering" : "Thermal";
+		ImGui::Checkbox("Thermal", &Camera->bThermal);
+		bool opp = !Camera->bThermal;
+		ImGui::Checkbox("Scattering", &opp);
+		if (opp != !Camera->bThermal)
+			Camera->bThermal = !opp;
 
 		if (ImGui::Button("Reset"))
 		{

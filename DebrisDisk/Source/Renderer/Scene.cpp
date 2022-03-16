@@ -54,12 +54,17 @@ namespace DebrisDisk
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         int Width, Height, NrChannels;
-        unsigned char* TextureData = stbi_load("Content/colormap.png", &Width, &Height, &NrChannels, 0);
+        unsigned char* TextureData;
+        if (!Camera->bThermal)
+            TextureData = stbi_load("Content/thermal.png", &Width, &Height, &NrChannels, 0);
+        else
+            TextureData = stbi_load("Content/scattering.png", &Width, &Height, &NrChannels, 0);
+
         if (TextureData)
         {
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, Width, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureData);
         }
-        else  LOG_ERROR("Failed to log texture");
+        else LOG_ERROR("Failed to log texture");
         stbi_image_free(TextureData);
 
         glUniform1i(glGetUniformLocation(Shader->ID, "Texture"), 0);
@@ -74,6 +79,8 @@ namespace DebrisDisk
         
         glUseProgram(Shader->ID);
         glUniformMatrix4fv(glGetUniformLocation(Shader->ID, "ViewProjectionMat"), 1, GL_FALSE, glm::value_ptr(Camera->ViewProjectionMat));
+        glUniform1f(glGetUniformLocation(Shader->ID, "MaxBeta"), Disk->MaxBeta);
+        glUniform1f(glGetUniformLocation(Shader->ID, "MaxRad2"), Disk->MaxRad2);
         glUniform3f(glGetUniformLocation(Shader->ID, "CameraPos"), Camera->Position.x, Camera->Position.y, Camera->Position.z);
         
         glBindVertexArray(VAO);
@@ -86,7 +93,7 @@ namespace DebrisDisk
         glPointSize(1);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Count);
+        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Particles.size());
         
         glBindVertexArray(0);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);

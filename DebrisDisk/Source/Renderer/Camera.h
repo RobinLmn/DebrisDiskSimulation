@@ -14,6 +14,9 @@ namespace DebrisDisk
 		void Recalculate();
 
 	public:
+
+		bool bThermal = false;
+
 		glm::vec3 Position;
 
 		float Az = 0.f;

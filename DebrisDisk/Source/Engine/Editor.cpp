@@ -54,9 +54,16 @@ namespace DebrisDisk
 
 		ImGui::Begin("Camera");
 		ImGui::InputFloat("Speed", &Camera->Speed);
+		ImGui::InputFloat("Sensitivity", &Camera->Sensitivity);
 		ImGui::InputFloat("Az", &Camera->Az);
 		ImGui::InputFloat("Alt", &Camera->Alt);
 		ImGui::InputFloat("Distance", &Camera->Distance);
+
+		if (ImGui::Button("Thermal / Scattering"))
+		{
+			Camera->bThermal = !Camera->bThermal;
+		}
+
 		if (ImGui::Button("Reset"))
 		{
 			Camera->Alt = 0.0001f;

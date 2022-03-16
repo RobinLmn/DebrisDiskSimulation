@@ -30,7 +30,35 @@ namespace DebrisDisk
 			Particles.insert(Particles.end(), OrbitParticles.begin(), OrbitParticles.end());
 		}
 
-		Count = static_cast<uint32_t>(Orbits.size()) * ParticlesPerOrbit;
+		int Count = Particles.size();
+
+		LOG_INFO("Particles Count: {0} ; Unconverging Anomalies: {1}", Count, UnconvergingAnomaly);
+
+		for (int i = 0; i < Count; ++i)
+		{
+			if (Particles[i].Beta < MaxBeta)
+				MaxBeta = Particles[i].Beta;
+			if (Particles[i].Rad2 < MaxRad2)
+				MaxRad2 = Particles[i].Rad2;
+		}
+	}
+
+	float SDebrisDisk::SolveEccentricAnomaly(float M /*Mean Anomaly*/, float e /*Orbit eccentricity*/ )
+	{
+		ZoneScoped
+
+		float E = M;	// guess, E ~ M
+		float F = E - e * glm::sin(E) - M;
+		int j = 0;
+		while (glm::abs(F) > 0.0001f && j < 100)
+		{
+			E = E - F / (1.f - e * glm::cos(E));
+			F = E - e * glm::sin(E) - M;
+			j++;
+		}
+		if (j >= 50) UnconvergingAnomaly++;
+
+		return E;
 	}
 
 	std::vector<Particle>* SDebrisDisk::OrbitToParticle(Orbit O)
@@ -44,17 +72,8 @@ namespace DebrisDisk
 		{
 			// Random Mean Anomaly
 			float M = glm::linearRand(-PI, PI);
-
-			// Newton approximation for Eccentric Anomaly
-			float E = M;	// guess, E ~ M
-			float F = E - O.e * glm::sin(E) - M;
-			int j = 0;
-			while (glm::abs(F) > 0.0001f)
-			{
-				E = E - F / (1.f - O.e * glm::cos(E));
-				F = E - O.e * glm::sin(E) - M;
-				j++;
-			}
+			// Eccentric Anomaly
+			float E = SolveEccentricAnomaly(M, O.e);
 
 			float f = 0.5f * glm::sqrt( (1.f + O.e)/(1.f - O.e) ) * glm::tan(E * 0.5f);
 			f = 2.f * glm::atan(f);
@@ -70,6 +89,7 @@ namespace DebrisDisk
 			DustParticle.Rad2 = x*x + y*y + z*z;
 			DustParticle.Beta = O.Beta;
 			DustParticle.Pos = glm::vec4(y, z, -x, 1.f);
+			DustParticle.Temp = StarTemp * glm::sqrt(StarRad / glm::sqrt(DustParticle.Rad2));
 			ParticlesInOrbit->push_back(DustParticle);
 		}
 

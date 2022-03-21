@@ -6,6 +6,7 @@ uniform mat4 ViewProjectionMat;
 uniform vec3 CameraPos;
 uniform float MaxBeta;
 uniform float MaxRad2;
+uniform bool bThermal;
 
 out float MyIntensity;
 
@@ -37,7 +38,13 @@ void main()
     ParticleData P = Particles.Data[gl_InstanceID];
     gl_Position = ViewProjectionMat * vec4(P.Pos.xyz, 1.0);
 
-    float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
-    // MyIntensity = 5000.0 * HG_Combination(-CosT) / (P.Beta * P.Beta * P.Rad2);
-    MyIntensity = 0.015 * P.Temp;
+    if (bThermal)
+    {
+        MyIntensity = 0.015 * P.Temp;;
+    }
+    else
+    {
+        float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
+        MyIntensity = 5000.0 * HG_Combination(-CosT) / (P.Beta * P.Beta * P.Rad2);
+    }
 }

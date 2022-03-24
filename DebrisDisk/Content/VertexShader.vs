@@ -1,11 +1,9 @@
 #version 450 core
 
-#define M_PI 3.14159265359
+#define pi 3.14159265359
 
 uniform mat4 ViewProjectionMat;
 uniform vec3 CameraPos;
-uniform float MaxBeta;
-uniform float MaxRad2;
 uniform bool bThermal;
 
 out float MyIntensity;
@@ -25,12 +23,17 @@ layout(std140, binding = 0) readonly buffer ParticleBuffer
 
 float HG(float CosT, float G)
 {
-    return (1.0 - G * G) / (4.0 * M_PI * pow(1.0 + G * G - 2.0 * G * CosT, 1.5));
+    return (1.0 - G * G) / (4.0 * pi * pow(1.0 + G * G - 2.0 * G * CosT, 1.5));
 };
 
 float HG_Combination(float CosT)
 {
     return 0.7 * HG(-CosT, 0.995) + 0.16 * HG(-CosT, 0.6) + 0.14 * HG(-CosT, 0.02);
+}
+
+float PlanckFunction(float T)
+{
+    return 1 /(exp(1/T) - 1);
 }
 
 void main()
@@ -40,7 +43,7 @@ void main()
 
     if (bThermal)
     {
-        MyIntensity = 0.015 * P.Temp;;
+        MyIntensity = 0.03 * PlanckFunction(P.Temp);
     }
     else
     {

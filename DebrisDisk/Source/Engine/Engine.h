@@ -9,10 +9,26 @@
 
 namespace DebrisDisk
 {
+	struct FConfig
+	{
+		uint32_t ParticlesPerOrbit;
+		int Width;
+		int Height;
+		float Fov;
+		float NearPlane;
+		float FarPlane;
+		float FixedRadiation;
+		float StarRadius;
+		float StarMass;
+		float StarTemp;
+		std::string OrbitFile;
+	};
+
 	class FEngine
 	{
 	public:
 		static FEngine& GetEngine() { static FEngine Engine; return Engine; }
+		void ReadConfigFile();
 		void Run();
 
 		FEngine(FEngine& e) = delete;
@@ -28,6 +44,7 @@ namespace DebrisDisk
 	private:
 		bool bRunning = true;
 
+		FConfig* Config = nullptr;
 		FWindow* Window = nullptr;
 		FLog* Log = nullptr;
 		RScene* Scene = nullptr;

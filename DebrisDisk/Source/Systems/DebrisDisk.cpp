@@ -14,8 +14,8 @@
 
 namespace DebrisDisk
 {
-	SDebrisDisk::SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation)
-		: ParticlesPerOrbit(ParticlesPerOrbit), OrbitFile(OrbitFile), FixedRadiation(FixedRadiation)
+	SDebrisDisk::SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation, const SStar& Star)
+		: ParticlesPerOrbit(ParticlesPerOrbit), OrbitFile(OrbitFile), FixedRadiation(FixedRadiation), Star(Star)
 	{}
 
 	void SDebrisDisk::Init()
@@ -26,21 +26,13 @@ namespace DebrisDisk
 
 		for (int i = 0; i < Orbits.size(); i++)
 		{
-			std::vector<Particle> OrbitParticles = *OrbitToParticle(Orbits[i]);
+			std::vector<SParticle> OrbitParticles = *OrbitToParticle(Orbits[i]);
 			Particles.insert(Particles.end(), OrbitParticles.begin(), OrbitParticles.end());
 		}
 
 		int Count = Particles.size();
 
 		LOG_INFO("Particles Count: {0} ; Unconverging Anomalies: {1}", Count, UnconvergingAnomaly);
-
-		for (int i = 0; i < Count; ++i)
-		{
-			if (Particles[i].Beta < MaxBeta)
-				MaxBeta = Particles[i].Beta;
-			if (Particles[i].Rad2 < MaxRad2)
-				MaxRad2 = Particles[i].Rad2;
-		}
 	}
 
 	float SDebrisDisk::SolveEccentricAnomaly(float M /*Mean Anomaly*/, float e /*Orbit eccentricity*/ )
@@ -49,23 +41,23 @@ namespace DebrisDisk
 
 		float E = M;	// guess, E ~ M
 		float F = E - e * glm::sin(E) - M;
-		int j = 0;
-		while (glm::abs(F) > 0.0001f && j < 100)
+		int j = 0, MaxIter = 100;
+		while (glm::abs(F) > 0.0001f && j < MaxIter)
 		{
 			E = E - F / (1.f - e * glm::cos(E));
 			F = E - e * glm::sin(E) - M;
 			j++;
 		}
-		if (j >= 50) UnconvergingAnomaly++;
+		if (j >= MaxIter) UnconvergingAnomaly++;
 
 		return E;
 	}
 
-	std::vector<Particle>* SDebrisDisk::OrbitToParticle(Orbit O)
+	std::vector<SParticle>* SDebrisDisk::OrbitToParticle(SOrbit O)
 	{
 		ZoneScoped
 
-		std::vector<Particle>* ParticlesInOrbit = new std::vector<Particle>();
+		std::vector<SParticle>* ParticlesInOrbit = new std::vector<SParticle>();
 		ParticlesInOrbit->reserve(ParticlesPerOrbit);
 
 		for (uint32_t i = 0; i < ParticlesPerOrbit; i++)
@@ -85,11 +77,11 @@ namespace DebrisDisk
 			float y = r * ( glm::sin(O.Omega) * glm::cos(O.omega + f) + glm::cos(O.Omega) * glm::sin(O.omega + f) * glm::cos(O.I) );
 			float z = r * ( glm::sin(O.omega + f) * glm::sin(O.I) );
 		
-			Particle DustParticle;
+			SParticle DustParticle;
 			DustParticle.Rad2 = x*x + y*y + z*z;
 			DustParticle.Beta = O.Beta;
 			DustParticle.Pos = glm::vec4(y, z, -x, 1.f);
-			DustParticle.Temp = StarTemp * glm::sqrt(StarRad / glm::sqrt(DustParticle.Rad2));
+			DustParticle.Temp = Star.Temp * glm::sqrt(Star.Radius / glm::sqrt(DustParticle.Rad2));
 			ParticlesInOrbit->push_back(DustParticle);
 		}
 
@@ -103,6 +95,7 @@ namespace DebrisDisk
 	void SDebrisDisk::OrbitsFromFile(std::string Filename)
 	{
 		ZoneScoped
+
 		std::string Line;
 		std::ifstream File(Filename);
 
@@ -130,7 +123,7 @@ namespace DebrisDisk
 
 				Params.push_back(std::stof(currentParam));
 				
-				Orbit NewOrbit;
+				SOrbit NewOrbit;
 				NewOrbit.a = Params[0];
 				NewOrbit.e = Params[1];
 				NewOrbit.I = Params[2];

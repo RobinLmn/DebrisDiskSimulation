@@ -85,7 +85,7 @@ namespace DebrisDisk
 			// Eccentric Anomaly
 			const float E = SolveEccentricAnomaly(M, O.e);
 
-			float f = 0.5f * glm::sqrt( (1.f + O.e)/(1.f - O.e) ) * glm::tan(E * 0.5f);
+			float f = glm::sqrt( (1.f + O.e)/(1.f - O.e) ) * glm::tan(E * 0.5f);
 			f = 2.f * glm::atan(f);
 			f = f < 0.f ? 2.f * PI + f : f;
 

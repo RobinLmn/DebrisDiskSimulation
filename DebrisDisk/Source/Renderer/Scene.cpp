@@ -85,6 +85,8 @@ namespace DebrisDisk
         glUniformMatrix4fv(glGetUniformLocation(Shader->ID, "ViewProjectionMat"), 1, GL_FALSE, glm::value_ptr(Camera->ViewProjectionMat));
         glUniform1f(glGetUniformLocation(Shader->ID, "bThermal"), Camera->bThermal);
         glUniform1f(glGetUniformLocation(Shader->ID, "Intensity"), Camera->Intensity);
+        glUniform1f(glGetUniformLocation(Shader->ID, "Offset"), Camera->Offset);
+        glUniform1f(glGetUniformLocation(Shader->ID, "DustContribution"), Camera->DustContribution);
         glUniform3f(glGetUniformLocation(Shader->ID, "CameraPos"), Camera->Position.x, Camera->Position.y, Camera->Position.z);
         
         glBindVertexArray(VAO);

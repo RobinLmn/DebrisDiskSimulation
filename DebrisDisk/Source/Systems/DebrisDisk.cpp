@@ -96,7 +96,7 @@ namespace DebrisDisk
 			const float z = r * ( glm::sin(O.omega + f) * glm::sin(O.I) );
 		
 			SParticle DustParticle;
-			DustParticle.Rad2 = x*x + y*y + z*z;
+			DustParticle.Rad2 = r * r;
 			DustParticle.Beta = O.Beta;
 			DustParticle.Pos = glm::vec4(y, z, -x, 1.f);
 			DustParticle.Temp = Star.Temp * glm::sqrt(Star.Radius / glm::sqrt(DustParticle.Rad2));

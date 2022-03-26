@@ -59,6 +59,8 @@ namespace DebrisDisk
 		ImGui::InputFloat("Alt", &Camera->Alt);
 		ImGui::InputFloat("Distance", &Camera->Distance);
 		ImGui::SliderFloat("Intensity", &Camera->Intensity, 0.f, 10.f);
+		ImGui::SliderFloat("Offset", &Camera->Offset, -1.f, 1.f);
+		ImGui::SliderFloat("Dust Contribution", &Camera->DustContribution, 0.f, 1.f);
 
 		std::string ButtonName = Camera->bThermal ? "Scattering" : "Thermal";
 		ImGui::Checkbox("Thermal", &Camera->bThermal);

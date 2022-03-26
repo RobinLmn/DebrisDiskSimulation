@@ -102,7 +102,6 @@ namespace DebrisDisk
 			Editor->NewFrame();
 
 			CameraController->Update(DeltaTime);
-			DebrisDisk->Update(DeltaTime);
 			Editor->Update(DeltaTime);
 
 			Scene->Render();

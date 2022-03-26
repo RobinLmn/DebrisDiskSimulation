@@ -5,6 +5,7 @@
 uniform mat4 ViewProjectionMat;
 uniform vec3 CameraPos;
 uniform bool bThermal;
+uniform float Intensity;
 
 out float MyIntensity;
 
@@ -33,7 +34,7 @@ float HG_Combination(float CosT)
 
 float PlanckFunction(float T)
 {
-    return 1 /(exp(1/T) - 1);
+    return 0.11934 /(exp(14.413/T) - 1);
 }
 
 void main()
@@ -43,11 +44,11 @@ void main()
 
     if (bThermal)
     {
-        MyIntensity = 0.03 * PlanckFunction(P.Temp);
+        MyIntensity = Intensity * PlanckFunction(P.Temp);
     }
     else
     {
         float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
-        MyIntensity = 5000.0 * HG_Combination(-CosT) / (P.Beta * P.Beta * P.Rad2);
+        MyIntensity = Intensity * 1000.0 * HG_Combination(-CosT) / (P.Beta * P.Beta * P.Rad2);
     }
 }

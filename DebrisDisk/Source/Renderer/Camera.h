@@ -26,6 +26,8 @@ namespace DebrisDisk
 		float Speed = 100.0f;
 		float Sensitivity = 100.0f;
 
+		float Intensity = 5.0f;
+
 		glm::mat4 ProjectionMat;
 		glm::mat4 ViewMat;
 		glm::mat4 ViewProjectionMat;

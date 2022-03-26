@@ -11,23 +11,21 @@ namespace DebrisDisk
 	{
 	public:
 		SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation, const SStar& Star);
-		void Init();
-		void Update(float DeltaTime);
-		float SolveEccentricAnomaly(float M /*Mean Anomaly*/, float e /*Orbit eccentricity*/);
 
-		void OrbitsFromFile(std::string Filename);
-		std::vector<SParticle>* OrbitToParticle(SOrbit O);
+		void Init();
+		float SolveEccentricAnomaly(const float M /*Mean Anomaly*/, const float e /*Orbit eccentricity*/) const;
+
+		void OrbitsFromFile(const std::string Filename);
+		void OrbitToParticle(const SOrbit& O, const int index);
 
 	public:
-		uint32_t Count = 0;
-		uint32_t ParticlesPerOrbit;
-		uint32_t UnconvergingAnomaly = 0;
 
-		float FixedRadiation;
+		const uint32_t ParticlesPerOrbit;
+		const float FixedRadiation;
 
 		SStar Star;
 
-		std::string OrbitFile;
+		const std::string OrbitFile;
 
 		std::vector<SParticle> Particles;
 		std::vector<SOrbit> Orbits;

@@ -52,7 +52,7 @@ void main()
     else
     {
         float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
-        MyIntensity = Offset + Intensity * HG_Combination(CosT) / (P.Beta * P.Beta * P.Rad2);
+        MyIntensity = Offset + Intensity * 1000 * HG_Combination(CosT) / (P.Beta * P.Beta * P.Rad2);
     }
 
     MyAlpha = DustContribution;

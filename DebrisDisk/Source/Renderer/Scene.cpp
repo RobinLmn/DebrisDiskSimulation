@@ -101,8 +101,9 @@ namespace DebrisDisk
         
         glEnable(GL_PROGRAM_POINT_SIZE);
         glPointSize(1);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Particles.size());
         
         glBindVertexArray(0);

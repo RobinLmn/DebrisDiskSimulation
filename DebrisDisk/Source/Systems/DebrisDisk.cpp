@@ -29,14 +29,14 @@ namespace DebrisDisk
 		const size_t Workers = std::thread::hardware_concurrency();
 		const size_t OrbitsPerThread = OrbitSize / Workers;
 
-		for (int i = 0; i < ParticlesPerOrbit * OrbitSize; i++)
+		for (int i = 0; i < ParticlesPerOrbit * OrbitSize; ++i)
 		{
 			Particles.emplace_back(SParticle());
 		}
 
 		auto ConvertOrbitsToParticles = [this]( const int StartIndex, const int EndIndex)
 		{
-			for (size_t i = StartIndex; i < EndIndex; i++)
+			for (size_t i = StartIndex; i < EndIndex; ++i)
 			{
 				OrbitToParticle(Orbits[i], i * ParticlesPerOrbit);
 			}
@@ -74,7 +74,7 @@ namespace DebrisDisk
 		return E;
 	}
 
-	void SDebrisDisk::OrbitToParticle(const SOrbit& O, const int index)
+	void SDebrisDisk::OrbitToParticle(const SOrbit& O, const int Index)
 	{
 		ZoneScoped
 
@@ -83,9 +83,9 @@ namespace DebrisDisk
 			// Random Mean Anomaly
 			const float M = glm::linearRand(-PI, PI);
 			// Eccentric Anomaly
-			const float E = SolveEccentricAnomaly(M, O.e);
+			const float E = SolveEccentricAnomaly(M * 0.5f, O.e);
 
-			float f = glm::sqrt( (1.f + O.e)/(1.f - O.e) ) * glm::tan(E * 0.5f);
+			float f = glm::sqrt( (1.f + O.e)/(1.f - O.e) ) * glm::tan(E);
 			f = 2.f * glm::atan(f);
 			f = f < 0.f ? 2.f * PI + f : f;
 
@@ -100,7 +100,7 @@ namespace DebrisDisk
 			DustParticle.Beta = O.Beta;
 			DustParticle.Pos = glm::vec4(y, z, -x, 1.f);
 			DustParticle.Temp = Star.Temp * glm::sqrt(Star.Radius / glm::sqrt(DustParticle.Rad2));
-			Particles[i + index] = DustParticle;
+			Particles[Index + i] = DustParticle;
 		}
 	}
 

@@ -32,8 +32,7 @@ float HG(float CosT, float G)
 
 float HG_Combination(float CosT)
 {
-    // return 0.7 * HG(CosT, 0.995) + 0.16 * HG(CosT, 0.6) + 0.14 * HG(CosT, 0.02);
-    return HG(CosT, 0.5);
+    return 0.7 * HG(CosT, 0.995) + 0.16 * HG(CosT, 0.6) + 0.14 * HG(CosT, 0.02);
 }
 
 float PlanckFunction(float T)
@@ -53,7 +52,7 @@ void main()
     else
     {
         float CosT = dot(normalize(P.Pos.xyz), normalize(CameraPos));
-        MyIntensity = Offset + Intensity * 1000.0 * HG_Combination(CosT) / (P.Beta * P.Beta * P.Rad2);
+        MyIntensity = Offset + Intensity * HG_Combination(CosT) / (P.Beta * P.Beta * P.Rad2);
     }
 
     MyAlpha = DustContribution;

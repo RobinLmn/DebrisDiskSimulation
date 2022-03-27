@@ -19,14 +19,14 @@ namespace DebrisDisk
 
 		glm::vec3 Position;
 
-		float Az = 0.f;
-		float Alt = 0.0001f;
-		float Distance = 1000.f;
+		float Az = 5.f;
+		float Alt = 90.f;
+		float Distance = 500.f;
 
 		float Speed = 100.0f;
-		float Sensitivity = 0.2;
+		float Sensitivity = 0.2f;
 
-		float Intensity = 1.0f;
+		float Intensity = 0.218f;
 		float Offset = 0.0f;
 		float DustContribution = 0.1f;
 

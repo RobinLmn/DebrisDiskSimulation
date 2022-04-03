@@ -1,32 +1,79 @@
 #include "Engine.h"
 #include "Tracy/Tracy.hpp"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+
 namespace DebrisDisk
 {
 	FEngine::FEngine()
 	{
 		ZoneScoped
 
-		int Width = 1080;
-		int Height = 1080;
-		float Fov = 45.f;
-		float NearPlane = 0.f;
-		float FarPlane = 100.f;
-		uint32_t ParticlesPerOrbit = 1000;
-		float FixedRadiation = 0.35f;
-		std::string OrbitFile = "Content/dustorbit/single_inner_planet_single_collision_inclined_beta0.35_dustorbit.txt"; // moth		
-		//std::string OrbitFile = "Content/dustorbit/single_inner_planet_e0.7_Ifree0_efree0_betadistrb1.5_bmin0.1_bmax1.0_Isig0.15_dustorbit.txt"; // bug
-		//std::string OrbitFile = "Content/dustorbit/single_inner_planet_single_collision_beta0.35_dustorbit.txt"; // wings
+		Config = new FConfig();
+		ReadConfigFile();
 
-		float AspectRatio = static_cast<float>(Width) / static_cast<float>(Height);
-		RCamera* Camera = new RCamera(Fov, AspectRatio, NearPlane, FarPlane);
+		const float AspectRatio = static_cast<float>(Config->Width) / static_cast<float>(Config->Height);
+		RCamera* Camera = new RCamera(Config->Fov, AspectRatio, Config->NearPlane, Config->FarPlane);
 
-		Window = new FWindow(Width, Height, false);
+		SStar Star;
+		Star.Radius = Config->StarRadius;
+		Star.Mass = Config->StarMass;
+		Star.Temp = Config->StarTemp;
+
+		Window = new FWindow(Config->Width, Config->Height, false);
 		Log = new FLog();
-		DebrisDisk = new SDebrisDisk(ParticlesPerOrbit, OrbitFile, FixedRadiation);
+		DebrisDisk = new SDebrisDisk(Config->ParticlesPerOrbit, Config->OrbitFile, Config->FixedRadiation, Star);
 		Scene = new RScene(Camera, DebrisDisk);
 		CameraController = new RCameraController(Camera);
 		Editor = new FEditor(Camera);
+
+		delete Config;
+	}
+
+	void FEngine::ReadConfigFile()
+	{
+		std::string Line;
+		std::ifstream File("../.config");
+		std::vector<std::string> ConfigParams;
+
+		if (File.is_open())
+		{
+			while (std::getline(File, Line))
+			{
+				if (Line.length() == 0 || Line[0] == '#')
+					continue;
+
+				std::string Param;
+
+				int i;
+				for (i = 0; i < Line.length(); i++)
+					if (Line[i] == '=') break;
+
+				for (i += 2; i < Line.length(); i++)
+					Param.append(1, Line[i]);
+
+				ConfigParams.push_back(Param);
+			}
+
+			Config->ParticlesPerOrbit	= std::stoi(ConfigParams[0]);
+			Config->Width				= std::stoi(ConfigParams[1]);
+			Config->Height				= std::stoi(ConfigParams[2]);
+			Config->Fov					= std::stof(ConfigParams[3]);
+			Config->NearPlane			= std::stof(ConfigParams[4]);
+			Config->FarPlane			= std::stof(ConfigParams[5]);
+			Config->FixedRadiation		= std::stof(ConfigParams[6]);
+			Config->StarRadius			= std::stof(ConfigParams[7]);
+			Config->StarMass			= std::stof(ConfigParams[8]);
+			Config->StarTemp			= std::stof(ConfigParams[9]);
+			Config->OrbitFile			= ConfigParams[10];
+
+			File.close();
+		}
+		else LOG_ERROR("Unable to open config file.");
+
+		return;
 	}
 
 	void FEngine::Run()
@@ -55,7 +102,6 @@ namespace DebrisDisk
 			Editor->NewFrame();
 
 			CameraController->Update(DeltaTime);
-			DebrisDisk->Update(DeltaTime);
 			Editor->Update(DeltaTime);
 
 			Scene->Render();

@@ -7,35 +7,27 @@
 
 namespace DebrisDisk
 {
-	struct Orbit
-	{
-		float a;		// Semi Major Axis
-		float e;		// Eccentricity
-		float I;		// Inclinaison
-		float Omega;	// Longitude of Ascending Node
-		float omega;	// Argument of Periapse
-		float Beta;		// Radiation
-	};
-
 	class SDebrisDisk
 	{
 	public:
-		SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation);
-		void Init();
-		void Update(float DeltaTime);
+		SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation, const SStar& Star);
 
-		void OrbitsFromFile(std::string Filename);
-		std::vector<Particle>* OrbitToParticle(Orbit O);
+		void Init();
+		float SolveEccentricAnomaly(const float M /*Mean Anomaly*/, const float e /*Orbit eccentricity*/) const;
+
+		void OrbitsFromFile(const std::string Filename);
+		void OrbitToParticle(const SOrbit& O, const int index);
 
 	public:
-		uint32_t Count = 0;
-		uint32_t ParticlesPerOrbit;
 
-		float FixedRadiation;
+		const uint32_t ParticlesPerOrbit;
+		const float FixedRadiation;
 
-		std::string OrbitFile;
+		SStar Star;
 
-		std::vector<Particle> Particles;
-		std::vector<Orbit> Orbits;
+		const std::string OrbitFile;
+
+		std::vector<SParticle> Particles;
+		std::vector<SOrbit> Orbits;
 	};
 }

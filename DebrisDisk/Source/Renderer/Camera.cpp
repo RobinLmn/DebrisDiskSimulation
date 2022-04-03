@@ -42,13 +42,13 @@ namespace DebrisDisk
 		float AzRad = glm::radians(Az);
 		float AltRad = glm::radians(Alt);
 
-		float x = Distance * glm::cos(AzRad) * glm::sin(AltRad);
-		float y = Distance * glm::sin(AzRad) * glm::sin(AltRad);
-		float z = Distance * glm::cos(AltRad);
+		float x = Distance * glm::cos(AltRad) * glm::sin(AzRad);
+		float y = Distance * glm::sin(AltRad) * glm::sin(AzRad);
+		float z = Distance * glm::cos(AzRad);
 
 		Position = glm::vec3(y, z, -x);
 
-		Up = glm::rotateY(Up, Alt);
+		Up = glm::rotateY(Up, Az);
 
 		ViewMat = glm::lookAt(Position, glm::vec3(0.f), Up);
 		ViewProjectionMat = ProjectionMat * ViewMat;

@@ -41,29 +41,38 @@ namespace DebrisDisk
         glCreateBuffers(1, &ParticleBuffer);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ParticleBuffer);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, Disk->Particles.size() * sizeof(Particle), Disk->Particles.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, Disk->Particles.size() * sizeof(SParticle), Disk->Particles.data(), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
 
         glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, &Texture);
-        glBindTexture(GL_TEXTURE_1D, Texture);
+        glGenTextures(1, &ScatteringTexture);
+        glBindTexture(GL_TEXTURE_1D, ScatteringTexture);
+        LoadTexture("Scattering");
 
+        glGenTextures(1, &ThermalTexture);
+        glBindTexture(GL_TEXTURE_1D, ThermalTexture);
+        LoadTexture("Thermal");
+	}
+
+    void RScene::LoadTexture(std::string Name)
+    {
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         int Width, Height, NrChannels;
-        unsigned char* TextureData = stbi_load("Content/colormap.png", &Width, &Height, &NrChannels, 0);
+        unsigned char* TextureData = stbi_load(("Content/" + Name + ".png").c_str(), &Width, &Height, &NrChannels, 0);
+
         if (TextureData)
         {
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, Width, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureData);
         }
-        else  LOG_ERROR("Failed to log texture");
+        else LOG_ERROR("Failed to log texture");
         stbi_image_free(TextureData);
 
-        glUniform1i(glGetUniformLocation(Shader->ID, "Texture"), 0);
-	}
+        glUniform1i(glGetUniformLocation(Shader->ID, Name.c_str()), 0);
+    }
 
 	void RScene::Render()
 	{
@@ -74,19 +83,28 @@ namespace DebrisDisk
         
         glUseProgram(Shader->ID);
         glUniformMatrix4fv(glGetUniformLocation(Shader->ID, "ViewProjectionMat"), 1, GL_FALSE, glm::value_ptr(Camera->ViewProjectionMat));
+        glUniform1f(glGetUniformLocation(Shader->ID, "bThermal"), Camera->bThermal);
+        glUniform1f(glGetUniformLocation(Shader->ID, "Intensity"), Camera->Intensity);
+        glUniform1f(glGetUniformLocation(Shader->ID, "Offset"), Camera->Offset);
+        glUniform1f(glGetUniformLocation(Shader->ID, "DustContribution"), Camera->DustContribution);
         glUniform3f(glGetUniformLocation(Shader->ID, "CameraPos"), Camera->Position.x, Camera->Position.y, Camera->Position.z);
         
         glBindVertexArray(VAO);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ParticleBuffer);
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_1D, Texture);
+
+        if (Camera->bThermal)
+            glBindTexture(GL_TEXTURE_1D, ThermalTexture);
+        else
+            glBindTexture(GL_TEXTURE_1D, ScatteringTexture);
         
         glEnable(GL_PROGRAM_POINT_SIZE);
         glPointSize(1);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Count);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Particles.size());
         
         glBindVertexArray(0);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);

@@ -26,7 +26,7 @@ namespace DebrisDisk
 		float Speed = 100.0f;
 		float Sensitivity = 0.2f;
 
-		float Intensity = 0.218f;
+		float Intensity = 5.f;
 		float Offset = 0.0f;
 		float DustContribution = 0.1f;
 

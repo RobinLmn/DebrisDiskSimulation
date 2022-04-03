@@ -4,8 +4,9 @@ bin/
 bin-int/
 .idea/
 
+.DS_Store
+
 DebrisDisk/imgui.ini
-DebrisDisk/Content/Screenshots/
 
 # solution files
 **.sln

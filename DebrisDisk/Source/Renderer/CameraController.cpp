@@ -19,6 +19,20 @@ namespace DebrisDisk
 			Camera->IncAz(-(CurrentMousePosition.x - MousePosition.x) * Camera->Sensitivity);
 		}
 
+		if (FInput::IsKeyPressed(GLFW_KEY_A))
+			Camera->IncAz(DeltaTime * Camera->Sensitivity);
+		if (FInput::IsKeyPressed(GLFW_KEY_D))
+			Camera->IncAz(-DeltaTime * Camera->Sensitivity);
+
+		if (FInput::IsKeyPressed(GLFW_KEY_S))
+			Camera->IncAlt(-DeltaTime * Camera->Sensitivity);
+		if (FInput::IsKeyPressed(GLFW_KEY_W))
+			Camera->IncAlt(DeltaTime * Camera->Sensitivity);
+
+		if (FInput::IsKeyPressed(GLFW_KEY_UP))
+			Camera->Distance -= Camera->Speed * DeltaTime;
+		if (FInput::IsKeyPressed(GLFW_KEY_DOWN))
+			Camera->Distance += Camera->Speed * DeltaTime;
 		if (FInput::IsKeyPressed(GLFW_KEY_UP))
 			Camera->Distance -= Camera->Speed * DeltaTime;
 		if (FInput::IsKeyPressed(GLFW_KEY_DOWN))

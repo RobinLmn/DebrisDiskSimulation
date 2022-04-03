@@ -24,10 +24,7 @@ namespace DebrisDisk
 
 		OrbitsFromFile(OrbitFile);
 
-		std::vector<std::thread> Threads;
 		const size_t OrbitSize = Orbits.size();
-		const size_t Workers = std::thread::hardware_concurrency();
-		const size_t OrbitsPerThread = OrbitSize / Workers;
 
 		for (int i = 0; i < ParticlesPerOrbit * OrbitSize; ++i)
 		{
@@ -42,15 +39,23 @@ namespace DebrisDisk
 			}
 		};
 
-		for (size_t i = 0; i < Workers - 1; ++i)
 		{
-			Threads.emplace_back(ConvertOrbitsToParticles, i * OrbitsPerThread, (i + 1) * OrbitsPerThread);
-		}
-		Threads.emplace_back(ConvertOrbitsToParticles, (Workers-1) * OrbitsPerThread, OrbitSize);
+			ZoneScopedN("ConvertOrbitsToParticles")
 
-		for (std::thread& thread : Threads)
-		{
-			thread.join();
+			std::vector<std::thread> Threads;
+			const size_t Workers = 8;
+			const size_t OrbitsPerThread = OrbitSize / Workers;
+
+			for (size_t i = 0; i < Workers - 1; ++i)
+			{
+				Threads.emplace_back(ConvertOrbitsToParticles, i * OrbitsPerThread, (i + 1) * OrbitsPerThread);
+			}
+			Threads.emplace_back(ConvertOrbitsToParticles, (Workers - 1) * OrbitsPerThread, OrbitSize);
+
+			for (std::thread& thread : Threads)
+			{
+				thread.join();
+			}
 		}
 
 		LOG_INFO("Particles Count: {0}", Particles.size());

@@ -21,12 +21,12 @@ namespace DebrisDisk
 
 		float Az = 5.f;
 		float Alt = 90.f;
-		float Distance = 500.f;
+		float Distance = 400.f;
 
 		float Speed = 100.0f;
 		float Sensitivity = 0.2f;
 
-		float Intensity = 5.f;
+		float Intensity = 1.4f;
 		float Offset = 0.0f;
 		float DustContribution = 0.1f;
 

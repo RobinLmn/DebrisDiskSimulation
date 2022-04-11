@@ -59,8 +59,8 @@ def speedupcurve():
     
     plt.errorbar(range(1,9), init_time, yerr=init_error, label="Total loading time", linestyle="", marker=".", capsize=3, elinewidth=1)
     plt.errorbar(range(1,9), convert_time, yerr=convert_error, label="Conversion time", linestyle="", marker=".", capsize=3, elinewidth=1)
-    plt.xlabel("Time (s)")
-    plt.ylabel("Thread Count")
+    plt.xlabel("Thread Count")
+    plt.ylabel("Time (s)")
     plt.legend()
     plt.savefig("speed_up_curve.png")
     plt.close()
@@ -192,6 +192,3 @@ def frame_hist():
 # Main
 
 speedupcurve()
-countVSconversion()
-countVSfps()
-frame_hist()

@@ -15,7 +15,7 @@ namespace DebrisDisk
 
 	public:
 
-		bool bThermal = true;
+		bool bThermal = false;
 
 		glm::vec3 Position;
 
@@ -23,10 +23,10 @@ namespace DebrisDisk
 		float Alt = 180.f;
 		float Distance = 500;
 
-		float Speed = 100.0f;
+		float Speed = 50.f;
 		float Sensitivity = 0.2f;
 
-		float Intensity = 2.8f;
+		float Intensity = 1.4;
 		float Offset = 0.0f;
 		float DustContribution = 0.1f;
 

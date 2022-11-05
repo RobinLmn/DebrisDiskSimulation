@@ -13,6 +13,38 @@ In this project, 3-dimensional rendering techniques are used to visualize the mo
   
 </p>
 
-## Download
+## Packaging
 
-To download the tool, clone the repository, run "GenerateProjectFiles.bat" and build the solution.
+Coming soon. I need to work on a way to launch the tool without building the solution everytime. This will also allow the tool to be available on mac and linux.
+
+## Downloading the code source
+
+1. Clone the repository to your device.
+2. Download Visual Studio 2019 or more
+3. Run the file 'GenerateProject.bat'.
+4. Launch 'DebrisDisk.sln'. This will launch Visual Studio and the source code.
+
+There are three configurations: 'Debug', 'Profile' and 'Release'. Generally, 'Release' should be chosen for better performances. For debugging purposes, 'Debug' can be used. The 'Profile' configuration is used to measure the program's performances with the Tracy profiler.
+
+5. Select 'Release' next to 'x64' instead of 'Debug'
+6. Launch the program by clicking 'Local Windows Debugger'. This will launch the tool. 
+
+## Using the tool
+
+Every parameter is defined in the '.config' file. In this file, enter all the parameters associated with the simulation, like the size of the window, the parameters of the star, and the path to the file containing the orbits. Evering line starting by '#' is a comment and will not be read.
+
+In the tool, you can zoom in and zoom out using the arrow keys. You can rotate around by using WASD or moving the mouse and right clicking at the same time.
+
+The tool has two windows. The first one is a 'Photo Mode' to take a screenshot saved at 'DebrisDiskSimulation\DebrisDisk\Content\Screenshots'. The second window is to manually enter certain parameters, like the control speed, the disk rendering, or the viewing angles.
+
+## Navigating the source code
+
+The solution 'DebrisDisk' contains 5 projects: 'DebrisDisk', 'glad', 'GLFW', 'ImGui' and 'tracy'. The source code of the project is situated in the 'DebrisDisk' project. The other projects are third party tools and utilities.
+
+The 'DebrisDisk' project has 3 modules: 'Engine', 'Renderer', 'Systems'. The Renderer is what draws the disk on the screen. The Systems are what define the debris disk, the position of every particule, their color, etc. Finally, the Engine links the two together. The Engine also controls the window layout and the UI ('Editor').
+
+DebrisDisk.cpp and DebrisDisk.h are the most interesting files for the physics of the project. It defines a 'SDebrisDisk' class which goal is to populate a list of 'Particles' that the renderer will draw. This is done in th SDebrisDisk::Init() function. First, it loads the orbits from the file specified in the configuration file. Then, it converts every orbits to particles in the 'OrbitToParticle' method.
+
+## Contributing
+
+Feel free to submit pull requests, or to open an issue to report a bug.

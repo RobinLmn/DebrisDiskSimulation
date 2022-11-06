@@ -15,7 +15,7 @@ In this project, 3-dimensional rendering techniques are used to visualize the mo
 
 ## Packaging
 
-Coming soon. I need to work on a way to launch the tool without building the solution everytime. This will also allow the tool to be available on mac and linux.
+The latest release can be downloaded [here](https://github.com/RobinLmn/DebrisDiskSimulation/releases/latest). For now, there is only a windows version.
 
 ## Downloading the code source
 
@@ -31,7 +31,7 @@ There are three configurations: 'Debug', 'Profile' and 'Release'. Generally, 'Re
 
 ## Using the tool
 
-Every parameter is defined in the '.config' file. In this file, enter all the parameters associated with the simulation, like the size of the window, the parameters of the star, and the path to the file containing the orbits. Evering line starting by '#' is a comment and will not be read.
+Every parameter is defined in the '.config' file under the 'Content' directory. In this file, enter all the parameters associated with the simulation, like the size of the window, the parameters of the star, and the path to the file containing the orbits. Evering line starting by '#' is a comment and will not be read.
 
 In the tool, you can zoom in and zoom out using the arrow keys. You can rotate around by using WASD or moving the mouse and right clicking at the same time.
 

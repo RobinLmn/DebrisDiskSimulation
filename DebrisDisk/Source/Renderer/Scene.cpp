@@ -1,8 +1,6 @@
 #include "Scene.h"
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -13,6 +11,8 @@
 #include <Tracy/Tracy.hpp>
 #include "Engine/Log.h"
 #include "Engine/Engine.h"
+
+#include <glad/glad.h>
 
 namespace DebrisDisk
 {
@@ -105,7 +105,7 @@ namespace DebrisDisk
         glDisable(GL_DEPTH_TEST);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        glDrawArraysInstanced(GL_POINTS, 0, 1, Disk->Particles.size());
+        glDrawArraysInstanced(GL_POINTS, 0, 1, static_cast<GLsizei>(Disk->Particles.size()));
         
         glBindVertexArray(0);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);

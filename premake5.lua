@@ -65,6 +65,11 @@ project "DebrisDisk"
 		"GLFW_INCLUDE_NONE",
 	}
 
+	ignoredefaultlibraries 
+	{ 
+		"libcmt.lib"
+	}
+
 	filter "system:windows"
 		systemversion "latest"
 

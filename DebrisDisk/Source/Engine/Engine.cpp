@@ -35,7 +35,7 @@ namespace DebrisDisk
 	void FEngine::ReadConfigFile()
 	{
 		std::string Line;
-		std::ifstream File("../.config");
+		std::ifstream File("Content/.config");
 		std::vector<std::string> ConfigParams;
 
 		if (File.is_open())

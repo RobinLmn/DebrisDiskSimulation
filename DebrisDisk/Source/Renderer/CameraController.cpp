@@ -20,9 +20,9 @@ namespace DebrisDisk
 		}
 
 		if (FInput::IsKeyPressed(GLFW_KEY_A))
-			Camera->IncAlt(DeltaTime * Camera->Speed);
-		if (FInput::IsKeyPressed(GLFW_KEY_D))
 			Camera->IncAlt(-DeltaTime * Camera->Speed);
+		if (FInput::IsKeyPressed(GLFW_KEY_D))
+			Camera->IncAlt(DeltaTime * Camera->Speed);
 
 		if (FInput::IsKeyPressed(GLFW_KEY_S))
 			Camera->IncAz(-DeltaTime * Camera->Speed);

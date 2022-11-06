@@ -1,9 +1,7 @@
 #include "Engine/Engine.h"
 
-int main(int argc, char** argv)
+int main()
 {
 	DebrisDisk::FEngine& Engine = DebrisDisk::FEngine::GetEngine();
 	Engine.Run();
-
-	return 0;
 }

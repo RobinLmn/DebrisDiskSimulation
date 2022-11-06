@@ -14,7 +14,7 @@
 
 namespace DebrisDisk
 {
-	SDebrisDisk::SDebrisDisk(uint32_t ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation, const SStar& Star)
+	SDebrisDisk::SDebrisDisk(int ParticlesPerOrbit, std::string OrbitFile, float FixedRadiation, const SStar& Star)
 		: ParticlesPerOrbit(ParticlesPerOrbit), OrbitFile(OrbitFile), FixedRadiation(FixedRadiation), Star(Star)
 	{}
 
@@ -33,7 +33,7 @@ namespace DebrisDisk
 
 		auto ConvertOrbitsToParticles = [this]( const int StartIndex, const int EndIndex)
 		{
-			for (size_t i = StartIndex; i < EndIndex; ++i)
+			for (int i = StartIndex; i < EndIndex; ++i)
 			{
 				OrbitToParticle(Orbits[i], i * ParticlesPerOrbit);
 			}
@@ -83,7 +83,7 @@ namespace DebrisDisk
 	{
 		ZoneScoped
 
-		for (uint32_t i = 0; i < ParticlesPerOrbit; i++)
+		for (int i = 0; i < ParticlesPerOrbit; i++)
 		{
 			// Random Mean Anomaly
 			const float M = glm::linearRand(-PI, PI);
@@ -116,45 +116,45 @@ namespace DebrisDisk
 		std::string Line;
 		std::ifstream File(Filename);
 
-		if (File.is_open())
+		if (!File.is_open())
 		{
-			while (std::getline(File, Line))
+			LOG_ERROR("Unable to open orbit file.");
+			return;
+		}
+
+		while (std::getline(File, Line))
+		{
+			std::vector<float> Params;
+			std::string currentParam;
+
+			for (int i = 0; i < Line.length(); i++)
 			{
-				std::vector<float> Params;
-				std::string currentParam;
+				const char c = Line[i];
 
-				for (int i = 0; i < Line.length(); i++)
+				if (c == ' ')
 				{
-					const char c = Line[i];
-
-					if (c == ' ')
-					{
-						Params.push_back(std::stof(currentParam));
-						currentParam = "";
-					}
-					else
-					{
-						currentParam.append(1, c);
-					}
+					Params.push_back(std::stof(currentParam));
+					currentParam = "";
 				}
-
-				Params.push_back(std::stof(currentParam));
-				
-				SOrbit NewOrbit;
-				NewOrbit.a = Params[0];
-				NewOrbit.e = Params[1];
-				NewOrbit.I = Params[2];
-				NewOrbit.Omega = Params[3];
-				NewOrbit.omega = Params[4];
-				NewOrbit.Beta = Params.size() > 5 ? Params[5] : FixedRadiation;
-
-				Orbits.push_back(NewOrbit);
+				else
+				{
+					currentParam.append(1, c);
+				}
 			}
 
-			File.close();
-		}
-		else LOG_ERROR("Unable to open orbit file.");
+			Params.push_back(std::stof(currentParam));
+				
+			SOrbit NewOrbit;
+			NewOrbit.a = Params[0];
+			NewOrbit.e = Params[1];
+			NewOrbit.I = Params[2];
+			NewOrbit.Omega = Params[3];
+			NewOrbit.omega = Params[4];
+			NewOrbit.Beta = Params.size() > 5 ? Params[5] : FixedRadiation;
 
-		return;
+			Orbits.push_back(NewOrbit);
+		}
+
+		File.close();
 	}
 }

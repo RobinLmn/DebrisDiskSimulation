@@ -5,7 +5,6 @@
 
 namespace DebrisDisk
 {
-
 	FWindow::FWindow(int width, int height, int vsync)
 		: Width(width), Height(height), bVSync(vsync), NativeWindow(nullptr)
 	{

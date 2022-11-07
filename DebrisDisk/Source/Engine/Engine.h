@@ -22,6 +22,8 @@ namespace DebrisDisk
 		inline const FWindow& GetWindow() const { return *Window; }
 		static inline void Screenshot(std::string Filename) { RScene::Screenshot(Filename); }
 
+		unsigned int GetRenderTexture() const { return Scene->GetRenderTexture(); }
+
 	private:
 		FEngine();
 

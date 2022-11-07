@@ -3,8 +3,8 @@
 #include "tracy/Tracy.hpp"
 
 #include "ImGui/imgui.h"
-#include "ImGui/backends/imgui_impl_opengl3.cpp"
-#include "ImGui/backends/imgui_impl_glfw.cpp"
+#include "ImGui/imgui_impl_opengl3.cpp"
+#include "ImGui/imgui_impl_glfw.cpp"
 
 #include "Engine.h"
 
@@ -21,6 +21,7 @@ namespace DebrisDisk
 		ImGui::CreateContext();
 		ImGuiIO& IO = ImGui::GetIO(); (void)IO;
 		IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 		ImGui::StyleColorsDark();
 
@@ -29,7 +30,7 @@ namespace DebrisDisk
 
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(Window, true);
-		ImGui_ImplOpenGL3_Init("#version 450");
+		ImGui_ImplOpenGL3_Init("#version 150");
 	}
 
 	void FEditor::NewFrame()
@@ -43,6 +44,11 @@ namespace DebrisDisk
 	void FEditor::Update(float DeltaTime)
 	{
 		ZoneScoped
+
+		ImGui::Begin("GameWindow");
+		FEngine& Engine = FEngine::GetEngine();
+		ImGui::Image((ImTextureID)Engine.GetRenderTexture(), ImVec2(800, 800), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::End();
 
 		ImGui::Begin("Photo Mode");
 		ImGui::InputText("Save as", Filename, IM_ARRAYSIZE(Filename));

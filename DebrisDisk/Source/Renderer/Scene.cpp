@@ -28,6 +28,7 @@ namespace DebrisDisk
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
+        glGenFramebuffers(1, &FBO);
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -44,6 +45,8 @@ namespace DebrisDisk
         glBufferData(GL_SHADER_STORAGE_BUFFER, Disk->Particles.size() * sizeof(SParticle), Disk->Particles.data(), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
         Shader = new RShader("Content/VertexShader.vs", "Content/FragmentShader.fs");
 
         glActiveTexture(GL_TEXTURE0);
@@ -54,6 +57,28 @@ namespace DebrisDisk
         glGenTextures(1, &ThermalTexture);
         glBindTexture(GL_TEXTURE_1D, ThermalTexture);
         LoadTexture("Thermal");
+
+        glGenTextures(1, &RenderTexture);
+        glBindTexture(GL_TEXTURE_2D, RenderTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 800, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RenderTexture, 0);
+
+        unsigned int RBO;
+        glGenRenderbuffers(1, &RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 800);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            LOG_ERROR("Framebuffer is not complete!");
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
     void RScene::LoadTexture(std::string Name)
@@ -78,6 +103,8 @@ namespace DebrisDisk
 	{
         ZoneScoped
         
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
         glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
@@ -109,6 +136,7 @@ namespace DebrisDisk
         
         glBindVertexArray(0);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void RScene::Terminate()

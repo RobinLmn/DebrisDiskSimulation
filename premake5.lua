@@ -1,54 +1,45 @@
-workspace "DebrisDisk"
+workspace "debris_disk_simulation"
 	architecture "x64"
 	
 	configurations
 	{
-		"Debug",
-		"Release",
-		"Profile",
+		"debug",
+		"release",
+		"profile",
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-IncludeDir = {}
-IncludeDir["GLFW"] = "DebrisDisk/ThirdParty/GLFW/include"
-IncludeDir["glad"] = "DebrisDisk/ThirdParty/glad/include"
-IncludeDir["spdlog"] = "DebrisDisk/ThirdParty/spdlog/include"
-IncludeDir["glm"] = "TradescantiaEngine/ThirdParty/glm"
-IncludeDir["tracy"] = "TradescantiaEngine/ThirdParty/tracy"
-IncludeDir["stb_image"] = "TradescantiaEngine/ThirdParty/stb_image"
-IncludeDir["ImGui"] = "TradescantiaEngine/ThirdParty/ImGui"
+include "thirdparty/GLFW"
+include "thirdparty/glad"
+include "thirdparty/tracy"
+include "thirdparty/ImGui"
 
-include "DebrisDisk/ThirdParty/GLFW"
-include "DebrisDisk/ThirdParty/glad"
-include "DebrisDisk/ThirdParty/tracy"
-include "DebrisDisk/ThirdParty/ImGui"
-
-project "DebrisDisk"
-	location "DebrisDisk"
+project "debris_disk_simulation"
+	location ""
 	kind "ConsoleApp"
-	language "C++"
+	language "c++"
+	cppdialect "c++latest"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files
 	{
-		"%{prj.name}/Source/**.h",
-		"%{prj.name}/Source/**.cpp",
+		"source/**.h",
+		"source/**.cpp",
+		"source/**.hpp",
 	}
 
 	includedirs
 	{
-		"DebrisDisk/Source",
-		"DebrisDisk/ThirdParty",
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.glad}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.tracy}",
-		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.ImGui}",
+		"source",
+		"thirdparty/GLFW/include",
+		"thirdparty/glad/include",
+		"thirdparty/spdlog/include",
+		"thirdparty/glm",
+		"thirdparty/imgui",
+		"thirdparty/stb_image",
 	}
 
 	links
@@ -78,18 +69,18 @@ project "DebrisDisk"
 			"PLATFORM_WINDOWS",
 		}
 
-	filter "configurations:Debug"
+	filter "configurations:debug"
 		defines {"DEBUG"}
-		runtime "Debug"
+		runtime "debug"
 		symbols "on"
 	
-	filter "configurations:Release"
+	filter "configurations:release"
 		defines {"RELEASE"}
-		runtime "Release"
+		runtime "release"
 		optimize "on"
 
-	filter "configurations:Profile"
+	filter "configurations:profile"
 		defines {"RELEASE", "PROFILE", "TRACY_ENABLE"}
-		runtime "Release"
+		runtime "release"
 		optimize "on"
 		symbols "on"

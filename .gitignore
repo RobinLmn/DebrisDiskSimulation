@@ -4,9 +4,11 @@ bin/
 bin-int/
 .idea/
 
+# macOS
 .DS_Store
 
-DebrisDisk/imgui.ini
+#imgui
+imgui.ini
 
 # solution files
 **.sln
@@ -18,4 +20,3 @@ DebrisDisk/imgui.ini
 *.user
 # Prerequisites
 *.d
-DebrisDisk/imgui.ini

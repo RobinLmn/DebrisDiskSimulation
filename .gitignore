@@ -18,5 +18,7 @@ imgui.ini
 
 # Files
 *.user
+*.sim
+
 # Prerequisites
 *.d

@@ -6,6 +6,11 @@
 #include <sstream>
 #include <string>
 
+#ifdef PLATFORM_WINDOWS
+#include <windows.h>
+#include <commdlg.h>
+#endif
+
 #define MAGIC 0x53494D00
 #define VERSION 1
 
@@ -58,7 +63,7 @@ namespace sim
 		return orbits;
 	}
 
-    bool save_particles_to_file(const std::vector<particle>& particles, const star& star, const std::string& filename)
+    bool save_particles_to_file(const std::vector<particle>& particles, const std::string& filename)
     {
         std::ofstream file(filename, std::ios::binary);
         ASSERT( file.is_open(),  return false, "Could not open file {0}", filename);
@@ -70,13 +75,12 @@ namespace sim
         file.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
         file.write(reinterpret_cast<const char*>(&version), sizeof(version));
         file.write(reinterpret_cast<const char*>(&particle_count), sizeof(particle_count));
-        file.write(reinterpret_cast<const char*>(&star), sizeof(star));
         file.write(reinterpret_cast<const char*>(particles.data()), particles.size() * sizeof(particle));
 
         return true;
     }
 
-    std::pair<std::vector<particle>, star> load_particles_from_file(const std::string& filename)
+    std::vector<particle> load_particles_from_file(const std::string& filename)
     {
         std::ifstream file(filename, std::ios::binary);
         if (!file.is_open()) return {};
@@ -89,14 +93,62 @@ namespace sim
         ASSERT( version == VERSION, return {}, "File version mismatch");
 
         uint64_t particle_count;
-        star star_data;
-
         file.read(reinterpret_cast<char*>(&particle_count), sizeof(particle_count));
-        file.read(reinterpret_cast<char*>(&star_data), sizeof(star));
 
         std::vector<particle> particles(particle_count);
         file.read(reinterpret_cast<char*>(particles.data()), particle_count * sizeof(particle));
 
-        return {particles, star_data};
+        return particles;
     }
+
+	std::string open_file_dialog(const char* initial_directory, const char* files_filter)
+	{
+#ifdef PLATFORM_WINDOWS
+		char filename[MAX_PATH];
+
+		OPENFILENAMEA ofn{};
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = GetActiveWindow();
+		ofn.lpstrFilter = files_filter;
+		ofn.lpstrFile = filename;
+		ofn.nMaxFile = sizeof(filename);
+		ofn.lpstrInitialDir = initial_directory;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetOpenFileNameA(&ofn))
+		{
+			return filename;
+		}
+#else
+		LOG_ERROR("Platform not supported");
+#endif
+
+		return {};
+	}
+
+	std::string new_file_dialog(const char* initial_filename, const char* initial_directory, const char* files_filter)
+	{
+#ifdef PLATFORM_WINDOWS
+		char filename[MAX_PATH];
+		strcpy_s(filename, initial_filename);
+
+		OPENFILENAMEA ofn{};
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = GetActiveWindow();
+		ofn.lpstrFilter = files_filter;
+		ofn.lpstrFile = filename;
+		ofn.nMaxFile = sizeof(filename);
+		ofn.lpstrInitialDir = initial_directory;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetSaveFileNameA(&ofn))
+		{
+			return filename;
+		}
+#else
+		LOG_ERROR("Platform not supported");
+#endif
+
+		return {};
+	}
 }

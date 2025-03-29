@@ -1,0 +1,97 @@
+#include "new_scene_window.hpp"
+
+#include "file_utility.hpp"
+
+#include "imgui.h"
+
+namespace sim
+{
+	new_scene_window::new_scene_window(const std::function<void(scene&&)>& on_scene_created_callback)
+		: on_scene_created{ on_scene_created_callback }
+	{
+	}
+
+	void new_scene_window::show()
+	{
+		is_visible = true;
+	}
+
+	void new_scene_window::render()
+	{
+		if (is_visible)
+		{
+			ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
+
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+			ImGui::OpenPopup("New Scene");
+			is_visible = false;
+		}
+
+		if (ImGui::BeginPopupModal("New Scene"))
+		{
+			float content_height = ImGui::GetWindowHeight() - 60.0f;
+			ImGui::BeginChild("Content", ImVec2(0, content_height));
+
+			ImGui::Text("Star Properties");
+			ImGui::InputFloat("Mass", &star_mass, 0.0001f, 0.0005f, "%.5f");
+			ImGui::InputFloat("Luminosity", &star_luminosity, 100.0f, 1000.0f, "%.0f");
+			ImGui::InputFloat("Radius", &star_radius, 0.1f, 0.5f, "%.1f");
+
+			ImGui::Separator();
+
+			ImGui::Text("Orbit Properties");
+
+			if (ImGui::Button("Browse##1"))
+			{
+				std::string filename = open_file_dialog("content/dust_orbits/", "Text Files\0*.txt\0All Files\0*.*\0");
+				strcpy_s(orbits_file, filename.c_str());
+			}
+
+			ImGui::SameLine();
+			ImGui::InputText("Orbits File", orbits_file, sizeof(orbits_file));
+
+			ImGui::InputFloat("Fixed Radiation", &fixed_radiation, 0.01f, 0.1f, "%.2f");
+			ImGui::InputInt("Particles per Orbit", &particles_per_orbit, 10, 100);
+
+			ImGui::Separator();
+
+			ImGui::Text("Save Location");
+			if (ImGui::Button("Browse##2"))
+			{
+				std::string filename = new_file_dialog("debris_disk.sim", "content/simulations/", "Simulation Files\0*.sim\0All Files\0*.*\0");
+				strcpy_s(filepath, filename.c_str());
+			}
+
+			ImGui::SameLine();
+			ImGui::InputText("Filepath", filepath, sizeof(filepath));
+
+			ImGui::EndChild();
+
+			ImGui::Separator();
+
+			float button_width = 120.0f;
+			float button_spacing = 20.0f;
+			float total_button_width = (button_width * 2) + button_spacing;
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - total_button_width - 20.0f);
+			if (ImGui::Button("Create", ImVec2(button_width, 0)))
+			{
+				star disk_star{ star_mass, star_luminosity, star_radius };
+				scene new_scene{ disk_star, orbits_file, fixed_radiation, particles_per_orbit, filepath };
+
+				on_scene_created(std::move(new_scene));
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel", ImVec2(button_width, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+}

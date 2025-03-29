@@ -5,9 +5,6 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include <fstream>
-#include <sstream>
-#include <string>
 #include <thread>
 
 #define PI glm::pi<float>()
@@ -92,52 +89,5 @@ namespace sim
 		}
 
 		return debris_disk;
-	}
-
-	std::vector<orbit> load_orbits_from_file(const char* filename, const float fixed_radiation)
-	{
-		std::string line;
-		std::ifstream file(filename);
-
-		ASSERT(file.is_open(), return {}, "Unable to open orbit file.");
-
-		std::vector<orbit> orbits;
-
-		while (std::getline(file, line))
-		{
-			std::vector<float> Params;
-			std::string currentParam;
-
-			for (int i = 0; i < line.length(); i++)
-			{
-				const char c = line[i];
-
-				if (c == ' ')
-				{
-					Params.push_back(std::stof(currentParam));
-					currentParam = "";
-				}
-				else
-				{
-					currentParam.append(1, c);
-				}
-			}
-
-			Params.push_back(std::stof(currentParam));
-
-			orbit new_orbit;
-			new_orbit.a = Params[0];
-			new_orbit.e = Params[1];
-			new_orbit.I = Params[2];
-			new_orbit.Omega = Params[3];
-			new_orbit.omega = Params[4];
-			new_orbit.Beta = Params.size() > 5 ? Params[5] : fixed_radiation;
-
-			orbits.push_back(new_orbit);
-		}
-
-		file.close();
-
-		return orbits;
 	}
 }

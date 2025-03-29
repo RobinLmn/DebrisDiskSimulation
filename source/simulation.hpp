@@ -31,5 +31,4 @@ namespace sim
 	};
 
 	std::vector<particle> create_debris_disk(const std::vector<orbit>& orbits, int particles_per_orbit, const star& disk_star);
-	std::vector<orbit> load_orbits_from_file(const char* filename, float fixed_radiation);
 }

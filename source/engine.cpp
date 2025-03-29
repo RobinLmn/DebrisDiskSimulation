@@ -238,6 +238,8 @@ namespace sim
 	renderer::renderer()
 		: particle_count{ 0 }
 		, particle_buffer{ 0 }
+		, framebuffer{ 0 }
+		, render_texture{ 0 }
 	{
 		glGenVertexArrays(1, &vao);
 
@@ -250,6 +252,12 @@ namespace sim
 	renderer::~renderer()
 	{
 		glDeleteVertexArrays(1, &vao);
+
+		if (framebuffer != 0)
+			glDeleteFramebuffers(1, &framebuffer);
+
+		if (render_texture != 0)
+			glDeleteTextures(1, &render_texture);
 
 		if (particle_buffer != 0)
 			glDeleteBuffers(1, &particle_buffer);
@@ -269,6 +277,37 @@ namespace sim
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, particle_buffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, particle_count * particle_size, particles, GL_STATIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+
+	void renderer::create_framebuffer(int width, int height)
+	{
+		if (framebuffer != 0) 
+			glDeleteFramebuffers(1, &framebuffer);
+
+		if (render_texture != 0)
+			glDeleteTextures(1, &render_texture);
+
+		glGenFramebuffers(1, &framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+		glGenTextures(1, &render_texture);
+		glBindTexture(GL_TEXTURE_2D, render_texture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_texture, 0);
+	}
+
+	void renderer::bind_framebuffer(int width, int height)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glViewport(0, 0, width, height);
+	}
+
+	void renderer::unbind_framebuffer()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void renderer::clear()

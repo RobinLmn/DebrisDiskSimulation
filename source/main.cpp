@@ -3,6 +3,7 @@
 #include <log.hpp>
 #include <camera.hpp>
 #include <simulation.hpp>
+#include <file_utility.hpp>
 
 #include <vector>
 #include <chrono>
@@ -13,7 +14,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 void setup_dark_theme()
@@ -105,6 +105,8 @@ int main()
 	constexpr float offset = 0.0f;
 	constexpr float dust_contribution = 0.1f;
 
+	ImVec2 last_viewport_size{ 0, 0 };
+
 	std::vector<sim::orbit> orbits = sim::load_orbits_from_file(orbit_file, fixed_radiation);
 	std::vector<sim::particle> debris_disk = sim::create_debris_disk(orbits, particles_per_orbit, star);
 
@@ -119,38 +121,13 @@ int main()
 	const auto clock = std::chrono::high_resolution_clock{};
 	auto last_time = clock.now();
 
-	GLuint render_texture = 0;
-	GLuint framebuffer = 0;
-	ImVec2 last_viewport_size(0, 0);
-
-	auto create_framebuffer = [](int width, int height, GLuint& framebuffer, GLuint& render_texture) {
-		// Delete old framebuffer and texture if they exist
-		if (framebuffer != 0) {
-			glDeleteFramebuffers(1, &framebuffer);
-		}
-		if (render_texture != 0) {
-			glDeleteTextures(1, &render_texture);
-		}
-
-		// Create new framebuffer
-		glGenFramebuffers(1, &framebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-		// Create new texture
-		glGenTextures(1, &render_texture);
-		glBindTexture(GL_TEXTURE_2D, render_texture);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_texture, 0);
-	};
-
 	while (window.is_open())
 	{
 		using seconds = std::chrono::duration<float, std::ratio<1>>;
 		const auto delta_time = std::chrono::duration_cast<seconds>(clock.now() - last_time).count();
 		last_time = clock.now();
+
+		camera.update(delta_time);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -216,17 +193,33 @@ int main()
 			ImGui::Begin("Viewport");
 			{
 				ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-
+				
 				if (viewport_size.x != last_viewport_size.x || viewport_size.y != last_viewport_size.y)
 				{
-					create_framebuffer((int)viewport_size.x, (int)viewport_size.y, framebuffer, render_texture);
+					renderer.create_framebuffer((int)viewport_size.x, (int)viewport_size.y);
 					last_viewport_size = viewport_size;
 					
 					float aspect_ratio = viewport_size.x / viewport_size.y;
 					camera.set_aspect_ratio(aspect_ratio);
 				}
 
-				ImGui::Image((void*)(intptr_t)render_texture, viewport_size);
+				renderer.bind_framebuffer((int)viewport_size.x, (int)viewport_size.y);
+
+				renderer.clear();
+
+				shader.use();
+				shader.set_uniform("view_projection", camera.get_view_projection());
+				shader.set_uniform("camera_position", camera.get_position());
+				shader.set_uniform("thermal_radiation", thermal_radiation);
+				shader.set_uniform("intensity", intensity);
+				shader.set_uniform("offset", offset);
+				shader.set_uniform("dust_contribution", dust_contribution);
+				shader.set_uniform("colormap", thermal_radiation ? thermal_texture : scattering_texture);
+
+				renderer.render();
+				renderer.unbind_framebuffer();
+
+				ImGui::Image((void*)(intptr_t)renderer.get_render_texture(), viewport_size);
 			}
 			ImGui::End();
 
@@ -244,40 +237,10 @@ int main()
 		}
 		ImGui::End();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glViewport(0, 0, (int)last_viewport_size.x, (int)last_viewport_size.y);
-
-		camera.update(delta_time);
-
-		renderer.clear();
-
-		shader.use(); // @todo: make it part of the renderer
-
-		// @todo: no need to do that every frame: only do it when it changes
-		shader.set_uniform("view_projection", camera.get_view_projection());
-		shader.set_uniform("camera_position", camera.get_position());
-		shader.set_uniform("thermal_radiation", thermal_radiation);
-		shader.set_uniform("intensity", intensity);
-		shader.set_uniform("offset", offset);
-		shader.set_uniform("dust_contribution", dust_contribution);
-		shader.set_uniform("colormap", thermal_radiation ? thermal_texture : scattering_texture);
-
-		renderer.render();
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		window.update();
-	}
-
-	// Cleanup framebuffer and texture
-	if (framebuffer != 0) {
-		glDeleteFramebuffers(1, &framebuffer);
-	}
-	if (render_texture != 0) {
-		glDeleteTextures(1, &render_texture);
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();

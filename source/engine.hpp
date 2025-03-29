@@ -66,9 +66,17 @@ namespace sim
         void clear();
         void render();
 
+        void create_framebuffer(int width, int height);
+        void bind_framebuffer(int width, int height);
+        void unbind_framebuffer();
+        unsigned int get_render_texture() const { return render_texture; }
+
     private:
         unsigned int vao;
         unsigned int particle_buffer;
         size_t particle_count;
+
+        unsigned int framebuffer;
+        unsigned int render_texture;
     };
 }

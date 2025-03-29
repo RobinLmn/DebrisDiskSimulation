@@ -12,9 +12,16 @@
 namespace sim
 {
 	camera::camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane)
-		: projection{ glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane) }
+		: fov(fov)
+		, near_plane(near_plane)
+		, far_plane(far_plane)
+		, projection{ glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane) }
 	{
-		recalculate();
+	}
+
+	void camera::set_aspect_ratio(float aspect_ratio)
+	{
+		projection = glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane);
 	}
 
 	void camera::teleport(float in_distance, float in_az, float in_alt)
@@ -22,8 +29,6 @@ namespace sim
 		distance = in_distance;
 		az = in_az;
 		alt = in_alt;
-
-		recalculate();
 	}
 
 	void camera::set_settings(float in_speed, float in_sensitivity)
@@ -61,7 +66,7 @@ namespace sim
 			distance += delta_time * speed;
 
 		last_mouse_position = mouse_position;
-		recalculate(); // @todo: detect changes
+		recalculate(); // @todo: detect changes: no need to do that every frame
 	}
 
 	glm::mat4 camera::get_view_projection() const

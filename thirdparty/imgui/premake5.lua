@@ -19,6 +19,13 @@ project "ImGui"
 		"imstb_truetype.h",
 		"imgui_demo.cpp",
 		"imgui_tables.cpp",
+		"imgui_impl_glfw.cpp",
+		"imgui_impl_opengl3.cpp",
+	}
+
+	includedirs
+	{
+		"../glfw/include",
 	}
 
 	filter "system:windows"

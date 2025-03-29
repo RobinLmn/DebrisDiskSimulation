@@ -11,7 +11,9 @@ namespace sim
 
 	public:
 		void teleport(float distance, float az, float alt);
+		void set_aspect_ratio(float aspect_ratio);
 		void set_settings(float speed, float sensitivity);
+
 		void update(const float delta_time);
 
 		glm::mat4 get_view_projection() const;
@@ -30,6 +32,11 @@ namespace sim
 
 		float speed;
 		float sensitivity;
+
+		float fov;
+		float near_plane;
+		float far_plane;
+		float aspect_ratio;
 
 		glm::mat4 projection;
 		glm::mat4 view;

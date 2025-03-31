@@ -18,6 +18,9 @@
 
 #include <glfw/glfw3.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image/stb_image_write.h"
+
 void setup_dark_theme()
 {
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -77,9 +80,9 @@ void setup_dark_theme()
 
 int main()
 {
-	sim::initialize_logger();
+	sim::logger::initialize();
 
-	sim::window window{ 1920, 1080, "Particle Renderer" };
+	sim::window window{ 1920, 1080, "Debris Disk Simulation" };
 	sim::renderer renderer;
 	sim::shader shader{ "content/shaders/vertex.glsl", "content/shaders/fragment.glsl" };
 	sim::camera camera{ 45.f, 1.f, 0.f, 100.f };
@@ -105,7 +108,7 @@ int main()
 	setup_dark_theme();
 
 	camera.set_settings(50.f, 0.2f);
-	camera.teleport(500.f, 10.f, 10.f);
+	camera.teleport(500.f, 0.f, 90.f);
 
 	sim::texture_1d scattering_texture{ "content/textures/scattering.png", 0 };
 	sim::texture_1d thermal_texture{ "content/textures/thermal.png", 1 };
@@ -118,10 +121,11 @@ int main()
 	const auto clock = std::chrono::high_resolution_clock{};
 	auto last_time = clock.now();
 
-	constexpr bool thermal_radiation = false;
-	constexpr float intensity = 1.4f;
-	constexpr float offset = 0.0f;
-	constexpr float dust_contribution = 0.1f;
+	bool thermal_radiation = false;
+	float intensity = 1.4f;
+	float offset = 0.0f;
+	float dust_contribution = 0.1f;
+	bool show_info = false;
 
 	while (window.is_open())
 	{
@@ -153,6 +157,8 @@ int main()
 		}
 
 		static bool dockspace_open = true;
+		static bool take_screenshot = false;
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("dockspace", &dockspace_open, window_flags);
 		{
@@ -182,22 +188,11 @@ int main()
 
 					ImGui::Separator();
 
-					ImGui::MenuItem("Export");
+					if (ImGui::MenuItem("Export"))
+					{
+						take_screenshot = true;
+					}
 
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("Edit"))
-				{
-					ImGui::MenuItem("Undo", "Ctrl+Z");
-					ImGui::MenuItem("Redo", "Ctrl+Shift+Z", false, false);
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("Help"))
-				{
-					ImGui::MenuItem("About");
-					ImGui::MenuItem("Help");
 					ImGui::EndMenu();
 				}
 
@@ -231,15 +226,99 @@ int main()
 				shader.set_uniform("colormap", thermal_radiation ? thermal_texture : scattering_texture);
 
 				renderer.render();
+
+				if (take_screenshot)
+				{
+					int width = (int)viewport_size.x;
+					int height = (int)viewport_size.y;
+
+					std::vector<unsigned char> buffer = renderer.read_pixels(width, height);
+
+					std::vector<unsigned char> flipped_buffer(width * height * 3);
+					for (int y = 0; y < height; y++)
+					{
+						memcpy(flipped_buffer.data() + y * width * 3, buffer.data() + (height - 1 - y) * width * 3, width * 3);
+					}
+
+					std::string filename = sim::new_file_dialog("debris_disk.png", "", "Png Files\0*.png\0");
+					stbi_write_png(filename.c_str(), width, height, 3, flipped_buffer.data(), width * 3);
+
+					take_screenshot = false;
+				}
+
 				renderer.unbind_framebuffer();
 
 				ImGui::Image((void*)(intptr_t)renderer.get_render_texture(), viewport_size);
+
+				ImGui::SetCursorPos(ImVec2(viewport_size.x - 40, 35));
+				if (ImGui::Button("Info", ImVec2(40, 20)))
+				{
+					show_info = !show_info;
+				}
+
+				if (show_info)
+				{
+					ImGui::SetCursorPos(ImVec2(viewport_size.x - 120, 60));
+					ImGui::BeginGroup();
+					ImGui::Text("Particles: %.0e", static_cast<float>(renderer.get_particle_count()));
+					ImGui::Text("FPS: %.1f", 1.0f / delta_time);
+					ImGui::EndGroup();
+				}
 			}
 			ImGui::End();
 
 			ImGui::Begin("Properties");
 			{
-				ImGui::Text("Properties panel");
+				if (ImGui::Button("Reset"))
+				{
+					intensity = 1.4f;
+					offset = 0.0f;
+					dust_contribution = 0.1f;
+
+					camera.teleport(500.0f, 0.0f, 0.0f);
+					camera.set_settings(50.0f, 0.2f);
+				}
+
+				if (ImGui::CollapsingHeader("Debris Disk", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Checkbox("Thermal Radiation", &thermal_radiation);
+					ImGui::DragFloat("Intensity", &intensity, 0.01f, 0.0f, 10.0f, "%.2f");
+					ImGui::DragFloat("Offset", &offset, 0.01f, -1.0f, 1.0f, "%.2f");
+					ImGui::DragFloat("Dust Contribution", &dust_contribution, 0.001f, 0.0f, 1.0f, "%.3f");
+				}
+
+				if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					ImGui::Text("Position");
+					float distance = camera.get_distance();
+					float altitude = camera.get_altitude();
+					float azimuth = camera.get_azimuth();
+
+					bool position_changed = false;
+					position_changed |= ImGui::DragFloat("Distance", &distance, 1.f, 10.0f, 1000.0f, "%.1f");
+					position_changed |= ImGui::DragFloat("Altitude", &altitude, 0.1f, -90.0f, 90.0f, "%.1f");
+					position_changed |= ImGui::DragFloat("Azimuth", &azimuth, 0.1f, 0.f, 180.0f, "%.1f");
+
+					if (position_changed)
+					{
+						camera.teleport(distance, azimuth, altitude);
+					}
+
+					ImGui::Separator();
+
+					ImGui::Text("Settings");
+					static float sensitivity = 0.2f;
+					static float speed = 50.0f;
+
+					bool settings_changed = false;
+					settings_changed |= ImGui::DragFloat("Sensitivity", &sensitivity, 0.01f, 0.05f, 1.0f, "%.1f");
+					settings_changed |= ImGui::DragFloat("Speed", &speed, 1.f, 1.f, 100.0f, "%.2f");
+
+					if (settings_changed)
+					{
+						camera.set_settings(speed, sensitivity);
+					}
+				}
 			}
 			ImGui::End();
 

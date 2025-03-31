@@ -6,9 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
-#include "stb_image/stb_image_write.h"
 
 #include <fstream>
 #include <sstream>
@@ -21,7 +19,7 @@ namespace
 	}
 
 #ifdef DEBUG
-	void check_shader_compile_errors(unsigned int shaderID, std::string type)
+	void check_shader_compile_errors(const unsigned int shaderID, const char* type)
 	{
 		int success;
 		char infoLog[1024];
@@ -46,7 +44,7 @@ namespace
 
 namespace sim
 {
-	window::window(int width, int height, const char* title)
+	window::window(const int width, const int height, const char* title)
 		: native_window{ nullptr }
 	{
 		glfwInit();
@@ -81,40 +79,37 @@ namespace sim
 
 	shader::shader(const char* vertex_path, const char* fragment_path)
 	{
-		std::ifstream vShaderFile;
-		std::ifstream fShaderFile;
+		std::ifstream v_shader_file;
+		std::ifstream f_shader_file;
 
-		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		v_shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		f_shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-		vShaderFile.open(vertex_path);
-		fShaderFile.open(fragment_path);
-		std::stringstream vShaderStream, fShaderStream;
+		v_shader_file.open(vertex_path);
+		f_shader_file.open(fragment_path);
+		std::stringstream v_shader_stream, f_shader_stream;
 
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
+		v_shader_stream << v_shader_file.rdbuf();
+		f_shader_stream << f_shader_file.rdbuf();
 
-		vShaderFile.close();
-		fShaderFile.close();
+		v_shader_file.close();
+		f_shader_file.close();
 
-		std::string vertexCode = vShaderStream.str();
-		std::string fragmentCode = fShaderStream.str();
+		std::string vertex_code = v_shader_stream.str();
+		std::string fragment_code = f_shader_stream.str();
+		const char* v_shader_code = vertex_code.c_str();
+		const char* f_shader_code = fragment_code.c_str();
 
-		const char* vShaderCode = vertexCode.c_str();
-		const char* fShaderCode = fragmentCode.c_str();
-
-		unsigned int vertex;
-		vertex = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex, 1, &vShaderCode, NULL);
+		unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertex, 1, &v_shader_code, nullptr);
 		glCompileShader(vertex);
 
 #ifdef DEBUG
 		check_shader_compile_errors(vertex, "VERTEX");
 #endif
 
-		unsigned int fragment;
-		fragment = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment, 1, &fShaderCode, NULL);
+		unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragment, 1, &f_shader_code, nullptr);
 		glCompileShader(fragment);
 
 #ifdef DEBUG
@@ -263,14 +258,14 @@ namespace sim
 			glDeleteBuffers(1, &particle_buffer);
 	}
 
-	void renderer::load_particles(const size_t in_particle_count, const size_t particle_size, const void* particles)
+	void renderer::load_particles(const size_t particle_count, const size_t particle_size, const void* particles)
 	{
 		ASSERT(particles != nullptr, return, "particles were nullptr");
 
 		if (particle_buffer != 0)
 			glDeleteBuffers(1, &particle_buffer);
 
-		particle_count = in_particle_count;
+		this->particle_count = particle_count;
 
 		glGenBuffers(1, &particle_buffer);
 
@@ -279,9 +274,9 @@ namespace sim
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
-	void renderer::create_framebuffer(int width, int height)
+	void renderer::create_framebuffer(const int width, const int height)
 	{
-		if (framebuffer != 0) 
+		if (framebuffer != 0)
 			glDeleteFramebuffers(1, &framebuffer);
 
 		if (render_texture != 0)
@@ -299,7 +294,7 @@ namespace sim
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_texture, 0);
 	}
 
-	void renderer::bind_framebuffer(int width, int height)
+	void renderer::bind_framebuffer(const int width, const int height)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glViewport(0, 0, width, height);
@@ -310,9 +305,16 @@ namespace sim
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	std::vector<unsigned char> renderer::read_pixels(const int width, const int height) const
+	{
+		std::vector<unsigned char> pixels(width * height * 3);
+		glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+		return pixels;
+	}
+
 	void renderer::clear()
 	{
-		glClearColor(0.f, 0.f, 0.f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 

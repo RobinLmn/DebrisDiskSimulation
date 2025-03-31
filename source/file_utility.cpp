@@ -16,7 +16,7 @@
 
 namespace sim
 {
-    std::vector<orbit> load_orbits_from_file(const char* filename, const float fixed_radiation)
+	std::vector<orbit> load_orbits_from_file(const char* filename, const float fixed_radiation)
 	{
 		std::string line;
 		std::ifstream file(filename);
@@ -63,43 +63,43 @@ namespace sim
 		return orbits;
 	}
 
-    bool save_particles_to_file(const std::vector<particle>& particles, const std::string& filename)
-    {
-        std::ofstream file(filename, std::ios::binary);
-        ASSERT( file.is_open(),  return false, "Could not open file {0}", filename);
+	bool save_particles_to_file(const std::vector<particle>& particles, const std::string& filename)
+	{
+		std::ofstream file(filename, std::ios::binary);
+		ASSERT(file.is_open(), return false, "Could not open file {0}", filename);
 
-        const uint32_t magic = MAGIC;
-        const uint32_t version = VERSION;
-        const uint64_t particle_count = particles.size();
+		const uint32_t magic = MAGIC;
+		const uint32_t version = VERSION;
+		const uint64_t particle_count = particles.size();
 
-        file.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
-        file.write(reinterpret_cast<const char*>(&version), sizeof(version));
-        file.write(reinterpret_cast<const char*>(&particle_count), sizeof(particle_count));
-        file.write(reinterpret_cast<const char*>(particles.data()), particles.size() * sizeof(particle));
+		file.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
+		file.write(reinterpret_cast<const char*>(&version), sizeof(version));
+		file.write(reinterpret_cast<const char*>(&particle_count), sizeof(particle_count));
+		file.write(reinterpret_cast<const char*>(particles.data()), particles.size() * sizeof(particle));
 
-        return true;
-    }
+		return true;
+	}
 
-    std::vector<particle> load_particles_from_file(const std::string& filename)
-    {
-        std::ifstream file(filename, std::ios::binary);
-        if (!file.is_open()) return {};
+	std::vector<particle> load_particles_from_file(const std::string& filename)
+	{
+		std::ifstream file(filename, std::ios::binary);
+		if (!file.is_open()) return {};
 
-        uint32_t magic, version;
-        file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
-        ASSERT(magic == MAGIC, return {}, "File type not supported");
+		uint32_t magic, version;
+		file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
+		ASSERT(magic == MAGIC, return {}, "File type not supported");
 
-        file.read(reinterpret_cast<char*>(&version), sizeof(version));
-        ASSERT( version == VERSION, return {}, "File version mismatch");
+		file.read(reinterpret_cast<char*>(&version), sizeof(version));
+		ASSERT(version == VERSION, return {}, "File version mismatch");
 
-        uint64_t particle_count;
-        file.read(reinterpret_cast<char*>(&particle_count), sizeof(particle_count));
+		uint64_t particle_count;
+		file.read(reinterpret_cast<char*>(&particle_count), sizeof(particle_count));
 
-        std::vector<particle> particles(particle_count);
-        file.read(reinterpret_cast<char*>(particles.data()), particle_count * sizeof(particle));
+		std::vector<particle> particles(particle_count);
+		file.read(reinterpret_cast<char*>(particles.data()), particle_count * sizeof(particle));
 
-        return particles;
-    }
+		return particles;
+	}
 
 	std::string open_file_dialog(const char* initial_directory, const char* files_filter)
 	{

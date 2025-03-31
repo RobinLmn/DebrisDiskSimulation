@@ -6,77 +6,82 @@
 
 struct GLFWwindow;
 
-namespace sim 
+namespace sim
 {
-    class window 
-    {
-    public:
-        window(int width, int height, const char* title);
-        ~window();
+	class window
+	{
+	public:
+		window(const int width, const int height, const char* title);
+		~window();
 
-    public:
-        void update();
-        bool is_open() const;
+	public:
+		void update();
+		bool is_open() const;
 
-    private:
-        GLFWwindow* native_window;
-    };
+	private:
+		GLFWwindow* native_window;
+	};
 
-    class shader
-    {
-    public:
-        shader(const char* vertex_path, const char* fragment_path);
-        ~shader();
+	class shader
+	{
+	public:
+		shader(const char* vertex_path, const char* fragment_path);
+		~shader();
 
-    public:
-        void use() const;
-        
-        template<typename T>
-        void set_uniform(const char* name, const T& value) const;
+	public:
+		void use() const;
 
-    private:
-        unsigned int id;
-    };
+		template<typename T>
+		void set_uniform(const char* name, const T& value) const;
 
-    class texture_1d
-    {
-    public:
-        texture_1d(const char* filename, const unsigned int unit);
-        ~texture_1d();
+	private:
+		unsigned int id;
+	};
 
-    public:
-        void bind() const;
-        void unbind() const;
+	class texture_1d
+	{
+	public:
+		texture_1d(const char* filename, const unsigned int unit);
+		~texture_1d();
 
-        unsigned int get_unit() const;
+	public:
+		void bind() const;
+		void unbind() const;
 
-    private:
-        unsigned int id;
-        unsigned int unit;
-    };
+		unsigned int get_unit() const;
 
-    class renderer 
-    {
-    public:
-        renderer();
-        ~renderer();
+	private:
+		unsigned int id;
+		unsigned int unit;
+	};
 
-    public:
-        void load_particles(const size_t particle_count, const size_t particle_size, const void* particles);
-        void clear();
-        void render();
+	class renderer
+	{
+	public:
+		renderer();
+		~renderer();
 
-        void create_framebuffer(int width, int height);
-        void bind_framebuffer(int width, int height);
-        void unbind_framebuffer();
-        unsigned int get_render_texture() const { return render_texture; }
+	public:
+		void load_particles(const size_t particle_count, const size_t particle_size, const void* particles);
 
-    private:
-        unsigned int vao;
-        unsigned int particle_buffer;
-        size_t particle_count;
+		void clear();
+		void render();
 
-        unsigned int framebuffer;
-        unsigned int render_texture;
-    };
+		void create_framebuffer(const int width, const int height);
+		void bind_framebuffer(const int width, const int height);
+		void unbind_framebuffer();
+
+		unsigned int get_render_texture() const { return render_texture; }
+		size_t get_particle_count() const { return particle_count; }
+
+		std::vector<unsigned char> read_pixels(const int width, const int height) const;
+
+	private:
+		unsigned int vao;
+		unsigned int particle_buffer;
+		size_t particle_count;
+
+		unsigned int framebuffer;
+		unsigned int render_texture;
+	};
 }

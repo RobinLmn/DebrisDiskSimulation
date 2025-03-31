@@ -10,18 +10,23 @@
 
 namespace sim
 {
-#ifdef DEBUG
-	static std::shared_ptr<spdlog::logger> logger;
-#endif
+	class logger
+	{
+	public:
+		static void initialize();
 
-	void initialize_logger();
+	public:
+#ifdef DEBUG
+		static std::shared_ptr<spdlog::logger> spd_logger;
+#endif
+	};
 }
 
 #ifdef DEBUG
-#define LOG_ERROR(...) sim::logger->error(__VA_ARGS__)
-#define LOG_WARN(...)  sim::logger->warn(__VA_ARGS__)
-#define LOG_INFO(...)  sim::logger->info(__VA_ARGS__)
-#define LOG_TRACE(...) sim::logger->trace(__VA_ARGS__)
+#define LOG_ERROR(...) sim::logger::spd_logger->error(__VA_ARGS__)
+#define LOG_WARN(...)  sim::logger::spd_logger->warn(__VA_ARGS__)
+#define LOG_INFO(...)  sim::logger::spd_logger->info(__VA_ARGS__)
+#define LOG_TRACE(...) sim::logger::spd_logger->trace(__VA_ARGS__)
 #else
 #define LOG_ERROR(...)	
 #define LOG_WARN(...)	

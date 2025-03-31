@@ -4,14 +4,14 @@
 
 namespace sim
 {
-	bool input_manager::is_key_pressed(int key_code)
+	bool input_manager::is_key_pressed(const int key_code)
 	{
 		GLFWwindow* window = glfwGetCurrentContext();
 		const int state = glfwGetKey(window, key_code);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool input_manager::is_mouse_button_pressed(int button)
+	bool input_manager::is_mouse_button_pressed(const int button)
 	{
 		GLFWwindow* window = glfwGetCurrentContext();
 		const int state = glfwGetMouseButton(window, button);

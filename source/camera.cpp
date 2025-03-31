@@ -1,40 +1,45 @@
 #include "camera.hpp"
 
+#include "input_manager.hpp"
+
 #include <algorithm>
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/rotate_vector.hpp >
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <glfw/glfw3.h>
-
-#include "input_manager.hpp"
 
 namespace sim
 {
 	camera::camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane)
-		: fov(fov)
-		, near_plane(near_plane)
-		, far_plane(far_plane)
+		: fov{ fov }
+		, aspect_ratio{ aspect_ratio }
+		, near_plane{ near_plane }
+		, far_plane{ far_plane }
+		, is_dirty{ true }
 		, projection{ glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane) }
 	{
 	}
 
-	void camera::set_aspect_ratio(float aspect_ratio)
+	void camera::set_aspect_ratio(const float aspect_ratio)
 	{
 		projection = glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane);
+		is_dirty = true;
 	}
 
-	void camera::teleport(float in_distance, float in_az, float in_alt)
+	void camera::teleport(const float distance, const float az, const float alt)
 	{
-		distance = in_distance;
-		az = in_az;
-		alt = in_alt;
+		this->distance = distance;
+		this->az = az;
+		this->alt = alt;
+
+		is_dirty = true;
 	}
 
-	void camera::set_settings(float in_speed, float in_sensitivity)
+	void camera::set_settings(const float speed, const float sensitivity)
 	{
-		speed = in_speed;
-		sensitivity = in_sensitivity;
+		this->speed = speed;
+		this->sensitivity = sensitivity;
 	}
 
 	void camera::update(const float delta_time)
@@ -43,30 +48,32 @@ namespace sim
 
 		if (input_manager::is_mouse_button_pressed(GLFW_MOUSE_BUTTON_2))
 		{
-			increment_az((mouse_position.y - last_mouse_position.y) * sensitivity);
-			increment_alt(-(mouse_position.x - last_mouse_position.x) * sensitivity);
+			increment_alt((mouse_position.y - last_mouse_position.y) * sensitivity);
+			increment_az(-(mouse_position.x - last_mouse_position.x) * sensitivity);
 		}
 
 		if (input_manager::is_key_pressed(GLFW_KEY_A))
-			increment_alt(-delta_time * speed);
-
-		if (input_manager::is_key_pressed(GLFW_KEY_D))
-			increment_alt(delta_time * speed);
-
-		if (input_manager::is_key_pressed(GLFW_KEY_S))
 			increment_az(-delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_W))
+		if (input_manager::is_key_pressed(GLFW_KEY_D))
 			increment_az(delta_time * speed);
 
+		if (input_manager::is_key_pressed(GLFW_KEY_S))
+			increment_alt(-delta_time * speed);
+
+		if (input_manager::is_key_pressed(GLFW_KEY_W))
+			increment_alt(delta_time * speed);
+
 		if (input_manager::is_key_pressed(GLFW_KEY_UP))
-			distance -= delta_time * speed;
+			increment_distance(-delta_time * speed);
 
 		if (input_manager::is_key_pressed(GLFW_KEY_DOWN))
-			distance += delta_time * speed;
+			increment_distance(delta_time * speed);
 
 		last_mouse_position = mouse_position;
-		recalculate(); // @todo: detect changes: no need to do that every frame
+
+		if (is_dirty)
+			recalculate();
 	}
 
 	glm::mat4 camera::get_view_projection() const
@@ -79,14 +86,37 @@ namespace sim
 		return position;
 	}
 
+	float camera::get_distance() const
+	{
+		return distance;
+	}
+
+	float camera::get_altitude() const
+	{
+		return alt;
+	}
+
+	float camera::get_azimuth() const
+	{
+		return az;
+	}
+
 	void camera::increment_az(const float delta_az)
 	{
-		az = std::clamp(az + delta_az, 0.f, 360.f);
+		az = std::clamp(az + delta_az, 0.0f, 180.0f);
+		is_dirty = true;
 	}
 
 	void camera::increment_alt(const float delta_alt)
 	{
-		alt = std::clamp(alt + delta_alt, 0.f, 360.f);
+		alt = std::clamp(alt + delta_alt, -90.0f, 90.0f);
+		is_dirty = true;
+	}
+
+	void camera::increment_distance(const float delta_distance)
+	{
+		distance += delta_distance;
+		is_dirty = true;
 	}
 
 	void camera::recalculate()
@@ -94,15 +124,16 @@ namespace sim
 		const float az_radians = glm::radians(az);
 		const float alt_radians = glm::radians(alt);
 
-		const float x = distance * glm::cos(alt_radians) * glm::sin(az_radians);
-		const float y = distance * glm::sin(alt_radians) * glm::sin(az_radians);
-		const float z = distance * glm::cos(az_radians);
+		const float x = distance * glm::cos(alt_radians) * glm::cos(az_radians);
+		const float y = distance * glm::sin(alt_radians);
+		const float z = distance * glm::cos(alt_radians) * glm::sin(az_radians);
 
-		position = glm::vec3(y, z, -x);
-
+		position = glm::vec3{ x, y, z };
 		up = glm::rotateY(up, az);
 
-		view = glm::lookAt(position, glm::vec3(0.f), up);
+		view = glm::lookAt(position, glm::vec3{ 0.0f }, up);
 		view_projection = projection * view;
+
+		is_dirty = false;
 	}
 }

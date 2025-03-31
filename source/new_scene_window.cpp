@@ -22,7 +22,7 @@ namespace sim
 		{
 			ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 
-			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
 			ImGui::OpenPopup("New Scene");
@@ -31,7 +31,7 @@ namespace sim
 
 		if (ImGui::BeginPopupModal("New Scene"))
 		{
-			float content_height = ImGui::GetWindowHeight() - 60.0f;
+			const float content_height = ImGui::GetWindowHeight() - 60.0f;
 			ImGui::BeginChild("Content", ImVec2(0, content_height));
 
 			ImGui::Text("Star Properties");
@@ -45,7 +45,7 @@ namespace sim
 
 			if (ImGui::Button("Browse##1"))
 			{
-				std::string filename = open_file_dialog("content/dust_orbits/", "Text Files\0*.txt\0All Files\0*.*\0");
+				const std::string filename = open_file_dialog("content/dust_orbits/", "Text Files\0*.txt\0All Files\0*.*\0");
 				strcpy_s(orbits_file, filename.c_str());
 			}
 
@@ -60,7 +60,7 @@ namespace sim
 			ImGui::Text("Save Location");
 			if (ImGui::Button("Browse##2"))
 			{
-				std::string filename = new_file_dialog("debris_disk.sim", "content/simulations/", "Simulation Files\0*.sim\0All Files\0*.*\0");
+				const std::string filename = new_file_dialog("debris_disk.sim", "content/simulations/", "Simulation Files\0*.sim\0All Files\0*.*\0");
 				strcpy_s(filepath, filename.c_str());
 			}
 
@@ -71,13 +71,13 @@ namespace sim
 
 			ImGui::Separator();
 
-			float button_width = 120.0f;
-			float button_spacing = 20.0f;
-			float total_button_width = (button_width * 2) + button_spacing;
+			const float button_width = 120.0f;
+			const float button_spacing = 20.0f;
+			const float total_button_width = (button_width * 2) + button_spacing;
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - total_button_width - 20.0f);
 			if (ImGui::Button("Create", ImVec2(button_width, 0)))
 			{
-				star disk_star{ star_mass, star_luminosity, star_radius };
+				const star disk_star{ star_mass, star_luminosity, star_radius };
 				scene new_scene{ disk_star, orbits_file, fixed_radiation, particles_per_orbit, filepath };
 
 				on_scene_created(std::move(new_scene));

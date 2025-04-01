@@ -8,7 +8,7 @@
 #include <spdlog/fmt/ostr.h>
 #endif
 
-namespace sim
+namespace engine
 {
 	class logger
 	{
@@ -23,10 +23,10 @@ namespace sim
 }
 
 #ifdef DEBUG
-#define LOG_ERROR(...) sim::logger::spd_logger->error(__VA_ARGS__)
-#define LOG_WARN(...)  sim::logger::spd_logger->warn(__VA_ARGS__)
-#define LOG_INFO(...)  sim::logger::spd_logger->info(__VA_ARGS__)
-#define LOG_TRACE(...) sim::logger::spd_logger->trace(__VA_ARGS__)
+#define LOG_ERROR(...) engine::logger::spd_logger->error(__VA_ARGS__)
+#define LOG_WARN(...)  engine::logger::spd_logger->warn(__VA_ARGS__)
+#define LOG_INFO(...)  engine::logger::spd_logger->info(__VA_ARGS__)
+#define LOG_TRACE(...) engine::logger::spd_logger->trace(__VA_ARGS__)
 #else
 #define LOG_ERROR(...)	
 #define LOG_WARN(...)	

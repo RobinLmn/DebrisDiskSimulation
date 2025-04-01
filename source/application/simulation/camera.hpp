@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace sim
+namespace app
 {
 	class camera
 	{
@@ -22,6 +22,9 @@ namespace sim
 		float get_distance() const;
 		float get_altitude() const;
 		float get_azimuth() const;
+
+		float get_speed() const;
+		float get_sensitivity() const;
 
 	private:
 		void increment_az(const float delta_az);

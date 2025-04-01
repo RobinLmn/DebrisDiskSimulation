@@ -1,10 +1,10 @@
 #pragma once
 
-#include "simulation.hpp"
+#include "application/simulation/simulation.hpp"
 
 #include <string>
 
-namespace sim
+namespace app
 {
 	class scene
 	{

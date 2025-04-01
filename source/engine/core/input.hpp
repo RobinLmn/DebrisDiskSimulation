@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-namespace sim
+namespace engine
 {
 	class input_manager
 	{

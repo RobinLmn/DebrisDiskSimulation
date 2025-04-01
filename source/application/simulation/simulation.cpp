@@ -1,6 +1,6 @@
 #include "simulation.hpp"
 
-#include "log.hpp"
+#include "engine/core/log.hpp"
 
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/constants.hpp>
@@ -27,7 +27,7 @@ namespace
 		return E;
 	}
 
-	void add_orbit_to_disk_at_index(std::vector<sim::particle>& debris_disk, const sim::orbit& orbit, const size_t index, const int particles_per_orbit, const sim::star& star)
+	void add_orbit_to_disk_at_index(std::vector<app::particle>& debris_disk, const app::orbit& orbit, const size_t index, const int particles_per_orbit, const app::star& star)
 	{
 		for (int i = 0; i < particles_per_orbit; i++)
 		{
@@ -46,7 +46,7 @@ namespace
 			const float y = r * (glm::sin(orbit.Omega) * glm::cos(orbit.omega + f) + glm::cos(orbit.Omega) * glm::sin(orbit.omega + f) * glm::cos(orbit.I));
 			const float z = r * (glm::sin(orbit.omega + f) * glm::sin(orbit.I));
 
-			sim::particle particle;
+			app::particle particle;
 			particle.rad2 = r * r;
 			particle.beta = orbit.Beta;
 			particle.position = glm::vec4(y, z, -x, 1.f);
@@ -56,7 +56,7 @@ namespace
 	}
 }
 
-namespace sim
+namespace app
 {
 	std::vector<particle> create_debris_disk(const std::vector<orbit>& orbits, const int particles_per_orbit, const star& disk_star)
 	{

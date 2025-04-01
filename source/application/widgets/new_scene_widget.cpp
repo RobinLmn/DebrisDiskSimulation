@@ -1,24 +1,19 @@
-#include "new_scene_window.hpp"
+#include "new_scene_widget.hpp"
 
-#include "file_utility.hpp"
+#include "utils/file_utility.hpp"
 
-#include "imgui.h"
+#include <imgui.h>
 
-namespace sim
+namespace app
 {
-	new_scene_window::new_scene_window(const std::function<void(scene&&)>& on_scene_created_callback)
-		: on_scene_created{ on_scene_created_callback }
+	new_scene_widget::new_scene_widget(new_scene_widget_delegates&& delegates)
+		: delegates{ std::move(delegates) }
 	{
 	}
 
-	void new_scene_window::show()
+	void new_scene_widget::draw()
 	{
-		is_visible = true;
-	}
-
-	void new_scene_window::render()
-	{
-		if (is_visible)
+		if (delegates.should_popup())
 		{
 			ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 
@@ -26,7 +21,6 @@ namespace sim
 			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
 			ImGui::OpenPopup("New Scene");
-			is_visible = false;
 		}
 
 		if (ImGui::BeginPopupModal("New Scene"))
@@ -45,8 +39,9 @@ namespace sim
 
 			if (ImGui::Button("Browse##1"))
 			{
-				const std::string filename = open_file_dialog("content/dust_orbits/", "Text Files\0*.txt\0All Files\0*.*\0");
-				strcpy_s(orbits_file, filename.c_str());
+				const std::string filename = utils::open_file_dialog("content/dust_orbits/", "Text Files\0*.txt\0All Files\0*.*\0");
+				if (!filename.empty())
+					strcpy_s(orbits_file, filename.c_str());
 			}
 
 			ImGui::SameLine();
@@ -60,8 +55,9 @@ namespace sim
 			ImGui::Text("Save Location");
 			if (ImGui::Button("Browse##2"))
 			{
-				const std::string filename = new_file_dialog("debris_disk.sim", "content/simulations/", "Simulation Files\0*.sim\0All Files\0*.*\0");
-				strcpy_s(filepath, filename.c_str());
+				const std::string filename = utils::new_file_dialog("debris_disk.sim", "content/simulations/", "Simulation Files\0*.sim\0All Files\0*.*\0");
+				if (!filename.empty())
+					strcpy_s(filepath, filename.c_str());
 			}
 
 			ImGui::SameLine();
@@ -80,7 +76,7 @@ namespace sim
 				const star disk_star{ star_mass, star_luminosity, star_radius };
 				scene new_scene{ disk_star, orbits_file, fixed_radiation, particles_per_orbit, filepath };
 
-				on_scene_created(std::move(new_scene));
+				delegates.on_scene_created(std::move(new_scene));
 				ImGui::CloseCurrentPopup();
 			}
 

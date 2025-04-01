@@ -2,7 +2,7 @@
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace sim
+namespace engine
 {
 #ifdef DEBUG
 	std::shared_ptr<spdlog::logger> logger::spd_logger;

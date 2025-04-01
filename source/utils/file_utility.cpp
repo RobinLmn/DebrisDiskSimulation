@@ -1,6 +1,6 @@
 #include "file_utility.hpp"
 
-#include "log.hpp"
+#include "engine/core/log.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -14,16 +14,16 @@
 #define MAGIC 0x53494D00
 #define VERSION 1
 
-namespace sim
+namespace utils
 {
-	std::vector<orbit> load_orbits_from_file(const char* filename, const float fixed_radiation)
+	std::vector<app::orbit> load_orbits_from_file(const char* filename, const float fixed_radiation)
 	{
 		std::string line;
 		std::ifstream file(filename);
 
 		ASSERT(file.is_open(), return {}, "Unable to open orbit file.");
 
-		std::vector<orbit> orbits;
+		std::vector<app::orbit> orbits;
 
 		while (std::getline(file, line))
 		{
@@ -47,7 +47,7 @@ namespace sim
 
 			Params.push_back(std::stof(currentParam));
 
-			orbit new_orbit;
+			app::orbit new_orbit;
 			new_orbit.a = Params[0];
 			new_orbit.e = Params[1];
 			new_orbit.I = Params[2];
@@ -63,7 +63,7 @@ namespace sim
 		return orbits;
 	}
 
-	bool save_particles_to_file(const std::vector<particle>& particles, const std::string& filename)
+	bool save_particles_to_file(const std::vector<app::particle>& particles, const std::string& filename)
 	{
 		std::ofstream file(filename, std::ios::binary);
 		ASSERT(file.is_open(), return false, "Could not open file {0}", filename);
@@ -75,12 +75,12 @@ namespace sim
 		file.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
 		file.write(reinterpret_cast<const char*>(&version), sizeof(version));
 		file.write(reinterpret_cast<const char*>(&particle_count), sizeof(particle_count));
-		file.write(reinterpret_cast<const char*>(particles.data()), particles.size() * sizeof(particle));
+		file.write(reinterpret_cast<const char*>(particles.data()), particles.size() * sizeof(app::particle));
 
 		return true;
 	}
 
-	std::vector<particle> load_particles_from_file(const std::string& filename)
+	std::vector<app::particle> load_particles_from_file(const std::string& filename)
 	{
 		std::ifstream file(filename, std::ios::binary);
 		if (!file.is_open()) return {};
@@ -95,8 +95,8 @@ namespace sim
 		uint64_t particle_count;
 		file.read(reinterpret_cast<char*>(&particle_count), sizeof(particle_count));
 
-		std::vector<particle> particles(particle_count);
-		file.read(reinterpret_cast<char*>(particles.data()), particle_count * sizeof(particle));
+		std::vector<app::particle> particles(particle_count);
+		file.read(reinterpret_cast<char*>(particles.data()), particle_count * sizeof(app::particle));
 
 		return particles;
 	}
@@ -104,7 +104,7 @@ namespace sim
 	std::string open_file_dialog(const char* initial_directory, const char* files_filter)
 	{
 #ifdef PLATFORM_WINDOWS
-		char filename[MAX_PATH];
+		char filename[MAX_PATH] = {0};
 
 		OPENFILENAMEA ofn{};
 		ofn.lStructSize = sizeof(ofn);
@@ -129,7 +129,7 @@ namespace sim
 	std::string new_file_dialog(const char* initial_filename, const char* initial_directory, const char* files_filter)
 	{
 #ifdef PLATFORM_WINDOWS
-		char filename[MAX_PATH];
+		char filename[MAX_PATH] = {0};
 		strcpy_s(filename, initial_filename);
 
 		OPENFILENAMEA ofn{};

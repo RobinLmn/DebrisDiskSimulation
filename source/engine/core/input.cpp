@@ -1,8 +1,8 @@
-#include "input_manager.hpp"
+#include "input.hpp"
 
 #include <glfw/glfw3.h>
 
-namespace sim
+namespace engine
 {
 	bool input_manager::is_key_pressed(const int key_code)
 	{

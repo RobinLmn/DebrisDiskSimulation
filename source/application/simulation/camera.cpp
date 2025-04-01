@@ -1,6 +1,6 @@
 #include "camera.hpp"
 
-#include "input_manager.hpp"
+#include "engine/core/input.hpp"
 
 #include <algorithm>
 
@@ -9,7 +9,7 @@
 
 #include <glfw/glfw3.h>
 
-namespace sim
+namespace app
 {
 	camera::camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane)
 		: fov{ fov }
@@ -44,30 +44,30 @@ namespace sim
 
 	void camera::update(const float delta_time)
 	{
-		const glm::vec2 mouse_position = input_manager::get_mouse_position();
+		const glm::vec2 mouse_position = engine::input_manager::get_mouse_position();
 
-		if (input_manager::is_mouse_button_pressed(GLFW_MOUSE_BUTTON_2))
+		if (engine::input_manager::is_mouse_button_pressed(GLFW_MOUSE_BUTTON_2))
 		{
-			increment_alt((mouse_position.y - last_mouse_position.y) * sensitivity);
-			increment_az(-(mouse_position.x - last_mouse_position.x) * sensitivity);
+			increment_alt(-(mouse_position.y - last_mouse_position.y) * sensitivity);
+			increment_az((mouse_position.x - last_mouse_position.x) * sensitivity);
 		}
 
-		if (input_manager::is_key_pressed(GLFW_KEY_A))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_A))
 			increment_az(-delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_D))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_D))
 			increment_az(delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_S))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_S))
 			increment_alt(-delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_W))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_W))
 			increment_alt(delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_UP))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_UP))
 			increment_distance(-delta_time * speed);
 
-		if (input_manager::is_key_pressed(GLFW_KEY_DOWN))
+		if (engine::input_manager::is_key_pressed(GLFW_KEY_DOWN))
 			increment_distance(delta_time * speed);
 
 		last_mouse_position = mouse_position;
@@ -99,6 +99,16 @@ namespace sim
 	float camera::get_azimuth() const
 	{
 		return az;
+	}
+
+	float camera::get_speed() const
+	{
+		return speed;
+	}
+
+	float camera::get_sensitivity() const
+	{
+		return sensitivity;
 	}
 
 	void camera::increment_az(const float delta_az)

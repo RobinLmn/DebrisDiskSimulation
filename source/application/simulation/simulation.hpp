@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-namespace sim
+namespace app
 {
 	struct particle
 	{

@@ -21,6 +21,7 @@ A real-time visualization tool for simulating and analyzing debris disks around 
 
 ### Getting Started
 
+
 1. Download the latest release from the [releases page](https://github.com/robinlmn/DebrisDiskSimulation/releases/latest)
 2. Extract the ZIP file to your preferred location
 3. Run `DebrisDiskSimulation.exe`

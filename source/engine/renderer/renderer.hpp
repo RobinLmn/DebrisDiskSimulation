@@ -1,7 +1,5 @@
 #pragma once
 
-#include "engine/renderer/framebuffer.hpp"
-
 #include <vector>
 
 namespace engine
@@ -17,9 +15,7 @@ namespace engine
 		size_t get_particle_count() const { return particle_count; }
 
 		void clear();
-		void render();
-
-		framebuffer create_framebuffer(const int width, const int height);
+		void draw_particles();
 
 		std::vector<unsigned char> read_pixels(const int width, const int height) const;
 

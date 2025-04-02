@@ -47,19 +47,10 @@ private:
     unsigned int on_draw_requested(int width, int height);
     app::info_widget_properties get_info_widget_properties();
 
-private:
-    engine::framebuffer framebuffer;
-    glm::vec2 last_viewport_size;
+    void on_camera_moved();
 
-    bool should_take_screenshot = false;
-    bool show_new_scene_window = false;
-
-    bool thermal_radiation = false;
-    float intensity = 1.4f;
-    float offset = 0.0f;
-    float dust_contribution = 0.1f;
-
-    float delta_time = 0.0f;
+    void set_debris_disk_uniforms();
+    void set_camera_uniforms();
 
 private:    
     engine::window window;
@@ -73,4 +64,18 @@ private:
 
     engine::texture_1d scattering_texture;
     engine::texture_1d thermal_texture;
+
+private:
+    engine::framebuffer framebuffer;
+    glm::vec2 last_viewport_size;
+
+    bool should_take_screenshot = false;
+    bool show_new_scene_window = false;
+
+    bool thermal_radiation = false;
+    float intensity = 1.4f;
+    float offset = 0.0f;
+    float dust_contribution = 0.1f;
+
+    float delta_time = 0.0f;
 };

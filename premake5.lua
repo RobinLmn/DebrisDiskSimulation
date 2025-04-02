@@ -17,7 +17,7 @@ include "thirdparty/ImGui"
 
 project "debris_disk_simulation"
 	location ""
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "c++"
 	cppdialect "c++latest"
 

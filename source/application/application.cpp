@@ -5,6 +5,7 @@
 #include "engine/core/log.hpp"
 
 #include "utils/file_utility.hpp"
+#include "utils/image_utility.hpp"
 
 #include "application/widgets/menu_bar_widget.hpp"
 #include "application/widgets/new_scene_widget.hpp"
@@ -12,18 +13,20 @@
 #include "application/widgets/scene_view_widget.hpp"
 #include "application/widgets/viewport_widget.hpp"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image/stb_image_write.h"
-
 application::application()
-    : window{ 1920, 1080, "Debris Disk Simulation" }
+    : window{ 1920, 1080, "Debris Disk Renderer" }
     , renderer{}
     , editor{}
     , scattering_texture{ "content/textures/scattering.png", 0 }
     , thermal_texture{ "content/textures/thermal.png", 1 }
     , shader{ "content/shaders/vertex.glsl", "content/shaders/fragment.glsl" }
-    , camera{ 45.f, 1.f, 0.f, 100.f }
+    , camera{ 45.f, 1.f, 0.f, 100.f, [this](){ on_camera_moved(); } }
+    , framebuffer{ 1920, 1080 }
 {
+    int icon_width, icon_height, channels;
+    std::vector<unsigned char> pixels = utils::load_image("content/textures/icon.png", icon_width, icon_height, channels);
+    window.set_icon(pixels.data(), icon_width, icon_height);
+
     editor.add_widget<app::menu_bar_widget>(app::menu_bar_widget_delegates{
         [this]() { on_new_scene_requested(); },
         [this](const char* filename) { on_open_scene_requested(filename); },
@@ -60,8 +63,13 @@ void application::run()
     camera.set_settings(50.f, 0.2f);
     camera.teleport(500.f, 0.f, 90.f);
 
+    shader.use();
+
     scattering_texture.bind();
     thermal_texture.bind();
+
+    set_debris_disk_uniforms();
+    set_camera_uniforms();
 
     const auto clock = std::chrono::high_resolution_clock{};
     auto last_time = clock.now();
@@ -81,11 +89,27 @@ void application::run()
     }
 }
 
-unsigned int application::on_draw_requested(int width, int height) // @todo: wrap this in a viewport class?
+void application::set_debris_disk_uniforms()
+{
+    shader.set_uniform("thermal_radiation", thermal_radiation);
+    shader.set_uniform("intensity", intensity);
+    shader.set_uniform("offset", offset);
+    shader.set_uniform("dust_contribution", dust_contribution);
+    shader.set_uniform("colormap", thermal_radiation ? thermal_texture : scattering_texture);
+}
+
+void application::set_camera_uniforms()
+{
+    shader.set_uniform("view_projection", camera.get_view_projection());
+    shader.set_uniform("camera_position", camera.get_position());
+}
+
+unsigned int application::on_draw_requested(const int width, const int height)
 {
     if (width != last_viewport_size.x || height != last_viewport_size.y)
     {
-        framebuffer = renderer.create_framebuffer(width, height);
+        framebuffer.resize(width, height);
+
         last_viewport_size = { width, height };
 
         float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
@@ -95,26 +119,14 @@ unsigned int application::on_draw_requested(int width, int height) // @todo: wra
     framebuffer.bind();
 
     renderer.clear();
-
-    shader.use();
-    shader.set_uniform("view_projection", camera.get_view_projection());
-    shader.set_uniform("camera_position", camera.get_position());
-    shader.set_uniform("thermal_radiation", thermal_radiation);
-    shader.set_uniform("intensity", intensity);
-    shader.set_uniform("offset", offset);
-    shader.set_uniform("dust_contribution", dust_contribution);
-    shader.set_uniform("colormap", thermal_radiation ? thermal_texture : scattering_texture);
-
-    renderer.render();
+    renderer.draw_particles();
 
     if (should_take_screenshot)
     {
         const std::vector<unsigned char>& buffer = renderer.read_pixels(width, height);
 
-        const unsigned char* last_row = buffer.data() + (width * 4 * (height - 1));
-
-        std::string filename = utils::new_file_dialog("debris_disk.png", "", "Png Files\0*.png\0");
-        stbi_write_png(filename.c_str(), width, height, 4, last_row, -4 * width);
+        std::string filename = utils::new_file_dialog("debris_disk.png", "content/screenshots/", "Png Files\0*.png\0");
+        utils::save_image(filename.c_str(), width, height, 4, buffer.data());
 
         should_take_screenshot = false;
     }
@@ -135,6 +147,8 @@ void application::on_open_scene_requested(const char* filename)
     renderer.load_particles(new_scene.get_particles().size(), sizeof(app::particle), new_scene.get_particles().data());
 
     scene_hierarchy.add(std::move(new_scene));
+
+    set_debris_disk_uniforms();
 }
 
 void application::on_export_requested()
@@ -146,6 +160,8 @@ void application::on_scene_created(app::scene&& new_scene)
 {
     renderer.load_particles(new_scene.get_particles().size(), sizeof(app::particle), new_scene.get_particles().data());
     scene_hierarchy.add(std::move(new_scene));
+
+    set_debris_disk_uniforms();
 }
 
 bool application::should_popup_new_scene_window()
@@ -175,6 +191,8 @@ void application::on_debris_disk_properties_changed(const app::debris_disk_widge
     intensity = properties.intensity;
     offset = properties.offset;
     dust_contribution = properties.dust_contribution;
+
+    set_debris_disk_uniforms();
 }
 
 void application::on_camera_position_changed(const app::camera_widget_properties& properties)
@@ -210,4 +228,9 @@ void application::on_scene_selected(const app::scene& scene)
 app::info_widget_properties application::get_info_widget_properties()
 {
     return { renderer.get_particle_count(), 1.0f / delta_time };
+}
+
+void application::on_camera_moved()
+{
+    set_camera_uniforms();
 }

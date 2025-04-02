@@ -17,6 +17,8 @@ namespace engine
 		void update();
 		bool is_open() const;
 
+		void set_icon(unsigned char* pixels, const int width, const int height);
+
 	private:
 		GLFWwindow* native_window;
 	};

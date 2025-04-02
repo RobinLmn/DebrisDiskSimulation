@@ -11,13 +11,14 @@
 
 namespace app
 {
-	camera::camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane)
+	camera::camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane, std::function<void()>&& on_camera_moved)
 		: fov{ fov }
 		, aspect_ratio{ aspect_ratio }
 		, near_plane{ near_plane }
 		, far_plane{ far_plane }
 		, is_dirty{ true }
 		, projection{ glm::perspective(glm::radians(fov), aspect_ratio, near_plane, far_plane) }
+		, on_camera_moved{ std::move(on_camera_moved) }
 	{
 	}
 
@@ -73,7 +74,10 @@ namespace app
 		last_mouse_position = mouse_position;
 
 		if (is_dirty)
+		{
 			recalculate();
+			on_camera_moved();
+		}
 	}
 
 	glm::mat4 camera::get_view_projection() const

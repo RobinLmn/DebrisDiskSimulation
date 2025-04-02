@@ -2,7 +2,9 @@
 
 #include "application/application.hpp"
 
-int main()
+#include <Windows.h>
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	engine::logger::initialize();
 

@@ -3,12 +3,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <functional>
+
 namespace app
 {
 	class camera
 	{
 	public:
-		camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane);
+		camera(const float fov, const float aspect_ratio, const float near_plane, const float far_plane, std::function<void()>&& on_camera_moved);
 
 	public:
 		void teleport(const float distance, const float az, const float alt);
@@ -55,5 +57,7 @@ namespace app
 
 		glm::vec2 last_mouse_position{ 0.0f };
 		bool is_dirty;
+	
+		std::function<void()> on_camera_moved;
 	};
 }

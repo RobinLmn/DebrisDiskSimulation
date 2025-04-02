@@ -9,7 +9,6 @@ namespace
 {
 	void on_window_resize(GLFWwindow* window, const int width, const int height)
 	{
-		// @todo: should that be done in the renderer?
 		glViewport(0, 0, width, height);
 	}
 }
@@ -47,5 +46,17 @@ namespace engine
 	bool window::is_open() const
 	{
 		return !glfwWindowShouldClose(native_window);
+	}
+
+	void window::set_icon(unsigned char* pixels, const int width, const int height)
+	{
+		ASSERT(pixels != nullptr, return, "pixels were nullptr");
+
+		GLFWimage icon;
+		icon.width = width;
+		icon.height = height;
+		icon.pixels = pixels;
+
+		glfwSetWindowIcon(native_window, 1, &icon);
 	}
 }

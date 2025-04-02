@@ -44,27 +44,6 @@ namespace engine
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
-	framebuffer renderer::create_framebuffer(const int width, const int height)
-	{
-		framebuffer new_framebuffer;
-
-		new_framebuffer.width = width;
-		new_framebuffer.height = height;
-
-		glGenFramebuffers(1, &new_framebuffer.id);
-		glBindFramebuffer(GL_FRAMEBUFFER, new_framebuffer.id);
-
-		glGenTextures(1, &new_framebuffer.render_texture);
-		glBindTexture(GL_TEXTURE_2D, new_framebuffer.render_texture);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, new_framebuffer.render_texture, 0);
-
-		return new_framebuffer;
-	}
-
 	std::vector<unsigned char> renderer::read_pixels(const int width, const int height) const
 	{
 		std::vector<unsigned char> pixels(width * height * 4);
@@ -78,7 +57,7 @@ namespace engine
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void renderer::render()
+	void renderer::draw_particles()
 	{
 		if (particle_count == 0)
 			return;

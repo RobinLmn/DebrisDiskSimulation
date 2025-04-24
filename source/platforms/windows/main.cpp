@@ -1,5 +1,4 @@
 #include "engine/core/log.hpp"
-
 #include "application/application.hpp"
 
 #include <Windows.h>

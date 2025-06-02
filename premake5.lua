@@ -100,6 +100,8 @@ project "debris_disk_simulation"
 		defines
 		{
 			"PLATFORM_MACOS",
+			"GLFW_EXPOSE_NATIVE_COCOA",
+			"GLFW_EXPOSE_NATIVE_NSGL"
 		}
 
 		links
@@ -107,7 +109,8 @@ project "debris_disk_simulation"
 			"Cocoa.framework",
 			"IOKit.framework",
 			"CoreVideo.framework",
-			"AppKit.framework"
+			"AppKit.framework",
+			"OpenGL.framework"
 		}
 		
 		buildoptions
@@ -116,7 +119,7 @@ project "debris_disk_simulation"
 			"-x", "objective-c++"
 		}
 	
-		sysincludedirs
+		externalincludedirs
 		{
 			"thirdparty/GLFW/include",
 			"thirdparty/glad/include",

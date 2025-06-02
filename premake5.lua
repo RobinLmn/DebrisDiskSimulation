@@ -58,10 +58,12 @@ project "debris_disk_simulation"
 
 	filter "system:windows"
 		systemversion "latest"
+
 		defines
 		{
 			"PLATFORM_WINDOWS",
 		}
+
 		ignoredefaultlibraries 
 		{ 
 			"libcmt.lib"
@@ -72,6 +74,7 @@ project "debris_disk_simulation"
 		{
 			"PLATFORM_LINUX",
 		}
+
 		links
 		{
 			"X11",
@@ -82,10 +85,12 @@ project "debris_disk_simulation"
 			"gobject-2.0",
 			"glib-2.0"
 		}
+
 		buildoptions
 		{
 			"`pkg-config --cflags gtk+-3.0`"
 		}
+
 		linkoptions
 		{
 			"`pkg-config --libs gtk+-3.0`"
@@ -96,6 +101,7 @@ project "debris_disk_simulation"
 		{
 			"PLATFORM_MACOS",
 		}
+
 		links
 		{
 			"Cocoa.framework",
@@ -103,12 +109,13 @@ project "debris_disk_simulation"
 			"CoreVideo.framework",
 			"AppKit.framework"
 		}
+		
 		buildoptions
 		{
 			"-fobjc-arc",
 			"-x", "objective-c++"
 		}
-		
+	
 		sysincludedirs
 		{
 			"thirdparty/GLFW/include",
@@ -117,6 +124,14 @@ project "debris_disk_simulation"
 			"thirdparty/glm",
 			"thirdparty/imgui",
 			"thirdparty/stb_image",
+		}
+
+		xcodebuildsettings
+		{
+			["INFOPLIST_FILE"] = "Info.plist",
+			["CODE_SIGN_IDENTITY"] = "-",
+			["CODE_SIGNING_REQUIRED"] = "NO",
+			["CODE_SIGNING_ALLOWED"] = "NO"
 		}
 
 	filter "configurations:debug"

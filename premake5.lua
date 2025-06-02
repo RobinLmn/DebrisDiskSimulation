@@ -17,6 +17,7 @@ include "thirdparty/ImGui"
 
 project "debris_disk_simulation"
 	location ""
+	kind "WindowedApp"
 	language "c++"
 	cppdialect "c++latest"
 
@@ -39,7 +40,6 @@ project "debris_disk_simulation"
 		"thirdparty/glm",
 		"thirdparty/imgui",
 		"thirdparty/stb_image",
-		"thirdparty/tracy",
 	}
 
 	links
@@ -60,48 +60,13 @@ project "debris_disk_simulation"
 	{ 
 		"libcmt.lib"
 	}
-	
+
 	filter "system:windows"
 		systemversion "latest"
-		kind "WindowedApp"
 
 		defines
 		{
 			"PLATFORM_WINDOWS",
-		}
-
-		removefiles
-		{
-			"source/platforms/macos/**.cpp",
-			"source/platforms/linux/**.cpp",
-		}
-
-	filter "system:macosx"
-		kind "ConsoleApp"
-		
-		defines
-		{
-			"PLATFORM_MACOS",
-		}
-
-		removefiles
-		{
-			"source/platforms/windows/**.cpp",
-			"source/platforms/linux/**.cpp",
-		}
-
-	filter "system:linux"
-		kind "ConsoleApp"
-
-		defines
-		{
-			"PLATFORM_LINUX",
-		}
-
-		removefiles
-		{
-			"source/platforms/windows/**.cpp",
-			"source/platforms/macos/**.cpp",
 		}
 
 	filter "configurations:debug"

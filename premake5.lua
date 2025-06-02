@@ -56,17 +56,57 @@ project "debris_disk_simulation"
 		"GLFW_INCLUDE_NONE",
 	}
 
-	ignoredefaultlibraries 
-	{ 
-		"libcmt.lib"
-	}
-
 	filter "system:windows"
 		systemversion "latest"
-
 		defines
 		{
 			"PLATFORM_WINDOWS",
+		}
+		ignoredefaultlibraries 
+		{ 
+			"libcmt.lib"
+		}
+
+	filter "system:linux"
+		defines
+		{
+			"PLATFORM_LINUX",
+		}
+		links
+		{
+			"X11",
+			"dl",
+			"pthread",
+			"gtk-3",
+			"gdk-3",
+			"gobject-2.0",
+			"glib-2.0"
+		}
+		buildoptions
+		{
+			"`pkg-config --cflags gtk+-3.0`"
+		}
+		linkoptions
+		{
+			"`pkg-config --libs gtk+-3.0`"
+		}
+
+	filter "system:macosx"
+		defines
+		{
+			"PLATFORM_MACOS",
+		}
+		links
+		{
+			"Cocoa.framework",
+			"IOKit.framework",
+			"CoreVideo.framework",
+			"AppKit.framework"
+		}
+		buildoptions
+		{
+			"-fobjc-arc",
+			"-x", "objective-c++"
 		}
 
 	filter "configurations:debug"

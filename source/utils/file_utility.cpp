@@ -6,9 +6,13 @@
 #include <sstream>
 #include <string>
 
-#ifdef PLATFORM_WINDOWS
-#include <windows.h>
-#include <commdlg.h>
+#if defined(PLATFORM_WINDOWS)
+    #include <windows.h>
+    #include <commdlg.h>
+#elif defined(PLATFORM_LINUX)
+    #include <gtk/gtk.h>
+#elif defined(PLATFORM_MACOS)
+    #include <Cocoa/Cocoa.h>
 #endif
 
 #define MAGIC 0x53494D00
@@ -103,52 +107,158 @@ namespace utils
 
 	std::string open_file_dialog(const char* initial_directory, const char* files_filter)
 	{
-#ifdef PLATFORM_WINDOWS
-		char filename[MAX_PATH] = {0};
+#if defined(PLATFORM_WINDOWS)
+        char filename[MAX_PATH] = {0};
 
-		OPENFILENAMEA ofn{};
-		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = GetActiveWindow();
-		ofn.lpstrFilter = files_filter;
-		ofn.lpstrFile = filename;
-		ofn.nMaxFile = sizeof(filename);
-		ofn.lpstrInitialDir = initial_directory;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+        OPENFILENAMEA ofn{};
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = GetActiveWindow();
+        ofn.lpstrFilter = files_filter;
+        ofn.lpstrFile = filename;
+        ofn.nMaxFile = sizeof(filename);
+        ofn.lpstrInitialDir = initial_directory;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-		if (GetOpenFileNameA(&ofn))
-		{
-			return filename;
-		}
+        if (GetOpenFileNameA(&ofn))
+        {
+            return filename;
+        }
+#elif defined(PLATFORM_LINUX)
+        if (!gtk_init_check(nullptr, nullptr))
+        {
+            LOG_ERROR("Failed to initialize GTK");
+            return {};
+        }
+
+        GtkWidget* dialog = gtk_file_chooser_dialog_new(
+            "Open File",
+            nullptr,
+            GTK_FILE_CHOOSER_ACTION_OPEN,
+            "_Cancel", GTK_RESPONSE_CANCEL,
+            "_Open", GTK_RESPONSE_ACCEPT,
+            nullptr
+        );
+
+        if (initial_directory)
+        {
+            gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), initial_directory);
+        }
+
+        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+        {
+            char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+            std::string result(filename);
+            g_free(filename);
+            gtk_widget_destroy(dialog);
+            return result;
+        }
+
+        gtk_widget_destroy(dialog);
+#elif defined(PLATFORM_MACOS)
+        @autoreleasepool {
+            NSOpenPanel* panel = [NSOpenPanel openPanel];
+            [panel setCanChooseFiles:YES];
+            [panel setCanChooseDirectories:NO];
+            [panel setAllowsMultipleSelection:NO];
+
+            if (initial_directory)
+            {
+                [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithUTF8String:initial_directory]]];
+            }
+
+            if ([panel runModal] == NSModalResponseOK)
+            {
+                NSURL* url = [[panel URLs] firstObject];
+                return [[url path] UTF8String];
+            }
+        }
 #else
-		LOG_ERROR("Platform not supported");
+        LOG_ERROR("Platform not supported");
 #endif
 
-		return {};
+        return {};
 	}
 
 	std::string new_file_dialog(const char* initial_filename, const char* initial_directory, const char* files_filter)
 	{
-#ifdef PLATFORM_WINDOWS
-		char filename[MAX_PATH] = {0};
-		strcpy_s(filename, initial_filename);
+#if defined(PLATFORM_WINDOWS)
+        char filename[MAX_PATH] = {0};
+        strcpy_s(filename, initial_filename);
 
-		OPENFILENAMEA ofn{};
-		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = GetActiveWindow();
-		ofn.lpstrFilter = files_filter;
-		ofn.lpstrFile = filename;
-		ofn.nMaxFile = sizeof(filename);
-		ofn.lpstrInitialDir = initial_directory;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+        OPENFILENAMEA ofn{};
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = GetActiveWindow();
+        ofn.lpstrFilter = files_filter;
+        ofn.lpstrFile = filename;
+        ofn.nMaxFile = sizeof(filename);
+        ofn.lpstrInitialDir = initial_directory;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-		if (GetSaveFileNameA(&ofn))
-		{
-			return filename;
-		}
+        if (GetSaveFileNameA(&ofn))
+        {
+            return filename;
+        }
+#elif defined(PLATFORM_LINUX)
+        if (!gtk_init_check(nullptr, nullptr))
+        {
+            LOG_ERROR("Failed to initialize GTK");
+            return {};
+        }
+
+        GtkWidget* dialog = gtk_file_chooser_dialog_new(
+            "Save File",
+            nullptr,
+            GTK_FILE_CHOOSER_ACTION_SAVE,
+            "_Cancel", GTK_RESPONSE_CANCEL,
+            "_Save", GTK_RESPONSE_ACCEPT,
+            nullptr
+        );
+
+        if (initial_directory)
+        {
+            gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), initial_directory);
+        }
+
+        if (initial_filename)
+        {
+            gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), initial_filename);
+        }
+
+        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+        {
+            char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+            std::string result(filename);
+            g_free(filename);
+            gtk_widget_destroy(dialog);
+            return result;
+        }
+
+        gtk_widget_destroy(dialog);
+#elif defined(PLATFORM_MACOS)
+        @autoreleasepool {
+            NSSavePanel* panel = [NSSavePanel savePanel];
+            [panel setCanCreateDirectories:YES];
+
+            if (initial_filename)
+            {
+                [panel setNameFieldStringValue:[NSString stringWithUTF8String:initial_filename]];
+            }
+
+            if (initial_directory)
+            {
+                [panel setDirectoryURL:[NSURL fileURLWithPath:[NSString stringWithUTF8String:initial_directory]]];
+            }
+
+            if ([panel runModal] == NSModalResponseOK)
+            {
+                NSURL* url = [panel URL];
+                return [[url path] UTF8String];
+            }
+        }
 #else
-		LOG_ERROR("Platform not supported");
+        LOG_ERROR("Platform not supported");
 #endif
 
-		return {};
+        return {};
 	}
 }

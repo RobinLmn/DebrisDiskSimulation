@@ -108,6 +108,16 @@ project "debris_disk_simulation"
 			"-fobjc-arc",
 			"-x", "objective-c++"
 		}
+		
+		sysincludedirs
+		{
+			"thirdparty/GLFW/include",
+			"thirdparty/glad/include",
+			"thirdparty/spdlog/include",
+			"thirdparty/glm",
+			"thirdparty/imgui",
+			"thirdparty/stb_image",
+		}
 
 	filter "configurations:debug"
 		defines {"DEBUG"}

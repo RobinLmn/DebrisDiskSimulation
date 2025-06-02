@@ -141,7 +141,9 @@ project "debris_disk_simulation"
 			["CODE_SIGNING_ALLOWED"] = "NO",
 			["CLANG_CXX_LANGUAGE_STANDARD"] = "c++20",
 			["CLANG_CXX_LIBRARY"] = "libc++",
-			["GCC_PREPROCESSOR_DEFINITIONS"] = "_GLFW_COCOA _GLFW_NSGL"
+			["GCC_PREPROCESSOR_DEFINITIONS"] = "_GLFW_COCOA _GLFW_NSGL",
+			["MACOSX_DEPLOYMENT_TARGET"] = "10.15",
+			["ARCHS"] = "x86_64 arm64"
 		}
 
 	filter "configurations:debug"

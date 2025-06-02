@@ -35,21 +35,9 @@ namespace engine
 #endif
 
 #ifdef DEBUG
-#if defined(PLATFORM_WINDOWS)
-	#define DEBUG_BREAK() __debugbreak()
-#elif defined(PLATFORM_LINUX)
-	#include <signal.h>
-	#define DEBUG_BREAK() raise(SIGTRAP)
-#elif defined(PLATFORM_MACOS)
-	#include <signal.h>
-	#define DEBUG_BREAK() raise(SIGTRAP)
+#define ASSERT(expression, exit_path, ...) if (!(expression)) { LOG_ERROR("Assertion failed: [{}] File [{}] Line [{}]\n{}", #expression, __FILE__, __LINE__, fmt::format(__VA_ARGS__)); __debugbreak(); exit_path; }
+#define ASSERT_FATAL(expression, ...) if (!(expression)) { LOG_ERROR("Fatal assertion failed: [{}] File [{}] Line [{}]\n{}", #expression, __FILE__, __LINE__, fmt::format(__VA_ARGS__)); __debugbreak(); abort(); }
 #else
-	#define DEBUG_BREAK()
-#endif
-
-    #define ASSERT(expression, exit_path, ...) if (!(expression)) { LOG_ERROR("Assertion failed: [{}] File [{}] Line [{}]\n{}", #expression, __FILE__, __LINE__, fmt::format(__VA_ARGS__)); DEBUG_BREAK(); exit_path; }
-    #define ASSERT_FATAL(expression, ...) if (!(expression)) { LOG_ERROR("Fatal assertion failed: [{}] File [{}] Line [{}]\n{}", #expression, __FILE__, __LINE__, fmt::format(__VA_ARGS__)); DEBUG_BREAK(); abort(); }
-#else
-    #define ASSERT(...) 
-    #define ASSERT_FATAL(...)
+#define ASSERT(expression, ...) 
+#define ASSERT_FATAL(expression)
 #endif

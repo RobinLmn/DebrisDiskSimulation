@@ -19,7 +19,7 @@ project "debris_disk_simulation"
 	location ""
 	kind "WindowedApp"
 	language "c++"
-	cppdialect "c++latest"
+	cppdialect "c++20"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -101,7 +101,9 @@ project "debris_disk_simulation"
 		{
 			"PLATFORM_MACOS",
 			"GLFW_EXPOSE_NATIVE_COCOA",
-			"GLFW_EXPOSE_NATIVE_NSGL"
+			"GLFW_EXPOSE_NATIVE_NSGL",
+			"_GLFW_COCOA",
+			"_GLFW_NSGL"
 		}
 
 		links
@@ -110,13 +112,15 @@ project "debris_disk_simulation"
 			"IOKit.framework",
 			"CoreVideo.framework",
 			"AppKit.framework",
-			"OpenGL.framework"
+			"OpenGL.framework",
+			"QuartzCore.framework"
 		}
 		
 		buildoptions
 		{
 			"-fobjc-arc",
-			"-x", "objective-c++"
+			"-x", "objective-c++",
+			"-std=c++20"
 		}
 	
 		externalincludedirs
@@ -134,7 +138,10 @@ project "debris_disk_simulation"
 			["INFOPLIST_FILE"] = "Info.plist",
 			["CODE_SIGN_IDENTITY"] = "-",
 			["CODE_SIGNING_REQUIRED"] = "NO",
-			["CODE_SIGNING_ALLOWED"] = "NO"
+			["CODE_SIGNING_ALLOWED"] = "NO",
+			["CLANG_CXX_LANGUAGE_STANDARD"] = "c++20",
+			["CLANG_CXX_LIBRARY"] = "libc++",
+			["GCC_PREPROCESSOR_DEFINITIONS"] = "_GLFW_COCOA _GLFW_NSGL"
 		}
 
 	filter "configurations:debug"

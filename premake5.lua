@@ -19,7 +19,7 @@ project "debris_disk_simulation"
 	location ""
 	kind "WindowedApp"
 	language "c++"
-	cppdialect "c++latest"
+	cppdialect "c++20"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -56,17 +56,94 @@ project "debris_disk_simulation"
 		"GLFW_INCLUDE_NONE",
 	}
 
-	ignoredefaultlibraries 
-	{ 
-		"libcmt.lib"
-	}
-
 	filter "system:windows"
 		systemversion "latest"
 
 		defines
 		{
 			"PLATFORM_WINDOWS",
+		}
+
+		ignoredefaultlibraries 
+		{ 
+			"libcmt.lib"
+		}
+
+	filter "system:linux"
+		defines
+		{
+			"PLATFORM_LINUX",
+		}
+
+		links
+		{
+			"X11",
+			"dl",
+			"pthread",
+			"gtk-3",
+			"gdk-3",
+			"gobject-2.0",
+			"glib-2.0"
+		}
+
+		buildoptions
+		{
+			"`pkg-config --cflags gtk+-3.0`"
+		}
+
+		linkoptions
+		{
+			"`pkg-config --libs gtk+-3.0`"
+		}
+
+	filter "system:macosx"
+		defines
+		{
+			"PLATFORM_MACOS",
+			"GLFW_EXPOSE_NATIVE_COCOA",
+			"GLFW_EXPOSE_NATIVE_NSGL",
+			"_GLFW_COCOA",
+			"_GLFW_NSGL"
+		}
+
+		links
+		{
+			"Cocoa.framework",
+			"IOKit.framework",
+			"CoreVideo.framework",
+			"AppKit.framework",
+			"OpenGL.framework",
+			"QuartzCore.framework"
+		}
+		
+		buildoptions
+		{
+			"-fobjc-arc",
+			"-x", "objective-c++",
+			"-std=c++20"
+		}
+	
+		externalincludedirs
+		{
+			"thirdparty/GLFW/include",
+			"thirdparty/glad/include",
+			"thirdparty/spdlog/include",
+			"thirdparty/glm",
+			"thirdparty/imgui",
+			"thirdparty/stb_image",
+		}
+
+		xcodebuildsettings
+		{
+			["INFOPLIST_FILE"] = "Info.plist",
+			["CODE_SIGN_IDENTITY"] = "-",
+			["CODE_SIGNING_REQUIRED"] = "NO",
+			["CODE_SIGNING_ALLOWED"] = "NO",
+			["CLANG_CXX_LANGUAGE_STANDARD"] = "c++20",
+			["CLANG_CXX_LIBRARY"] = "libc++",
+			["GCC_PREPROCESSOR_DEFINITIONS"] = "_GLFW_COCOA _GLFW_NSGL",
+			["MACOSX_DEPLOYMENT_TARGET"] = "10.15",
+			["ARCHS"] = "x86_64 arm64"
 		}
 
 	filter "configurations:debug"

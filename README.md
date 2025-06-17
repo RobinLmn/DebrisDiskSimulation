@@ -1,4 +1,4 @@
-# Debris Disk Simulation
+# Debris Disk Renderer
 
 A high-performance, real-time visualization tool for simulating and analyzing debris disks around exoplanetary systems. Built with modern graphics techniques to enable interactive exploration of disk morphologies.
 

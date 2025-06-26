@@ -34,6 +34,11 @@ Latest Windows Release: [v1.0.0](https://github.com/robinlmn/DebrisDiskSimulatio
 
 ### Basic Usage
 
+<div align="center">
+<img alt="alt_text" width="500px" src="docs/images/debris-disk-demo.gif" /><br>
+<i>The tool</i>
+</div>
+
 1. **Create New Simulation** (`File > New`)
    - Configure the star properties (mass, radius, temperature).
    - Set the dust properties (radiation, particle density).
